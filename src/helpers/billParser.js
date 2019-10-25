@@ -234,7 +234,7 @@ const billToSring = async (bill, result) => {
 
   var awkpart = ''
 
-  if (tot != 0) {
+  // if (tot != 0) {
       isSell = tot > 0
       tot = Math.abs(tot)
       awkpart = awkMsg
@@ -242,7 +242,7 @@ const billToSring = async (bill, result) => {
       .replace('x',avg)
       .replace('x',toman(bill.awkwardness.awk))
       .replace('x',toman(bill.awkwardness.sellprice))
-  }
+  // }
 
   console.log(awkpart)
 
