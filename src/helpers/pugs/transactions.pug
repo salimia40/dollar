@@ -1,0 +1,34 @@
+doctype html
+html
+    include ./head.pug
+    body
+        div.container.mt-5
+            div.row
+                div.col-sm 
+                    div logo here
+                    div= appname
+
+                div.col-sm 
+                    b گزارش ماهانه  #{name}
+        
+            table.table.mt-5.table-striped.table-light
+                thead.thead-dark
+                    tr
+                        th(scope ="col") شماره تراکنش
+                        th(scope ="col") واریز - برداشت
+                        th(scope ="col") مقدار(تومان)
+                        th(scope ="col") تاریخ
+                        th(scope ="col") توضیحات
+                        th(scope ="col") وضعیت
+                tbody
+                    each t, index in transactions
+                        tr
+                            th(scope ="row")= t.code
+                            if t.isCharge
+                                td.sell واریز
+                            else
+                                td.buy برداشت
+                            td= t.amount
+                            td= t.date
+                            td= t.explain
+                            td= t.state

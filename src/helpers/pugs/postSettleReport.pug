@@ -1,0 +1,44 @@
+doctype html
+html
+    include ./head.pug
+    body
+        div.container.mt-5
+            div.row
+                div.col-sm 
+                    div logo here
+                    div= appname
+
+                div.col-sm 
+                    b گزارش معاملات پس ار تسویه  #{name}
+        
+            table.table.mt-5.table-striped.table-light
+                thead.thead-dark
+                    tr
+                        th(scope ="col") #
+                        th(scope ="col") شماره تراکنش
+                        th(scope ="col") خرید / فروش
+                        th(scope ="col") شرایط معامله
+                        th(scope ="col") واحد
+                        th(scope ="col") نرخ مظنه
+                        th(scope ="col") طرف معامله
+                        th(scope ="col") زمان ثبت معامله
+                        th(scope ="col") سود و زیان
+                tbody
+                    each bill, index in bills
+                        tr
+                            th(scope ="row")= index
+                            td= bill.code
+                            if bill.isSell
+                                td.sell فروش
+                            else
+                                td.buy خرید
+                            td= bill.condition
+                            td= bill.amount
+                            td= bill.price
+                            td= bill.opponent
+                            td= bill.date
+                            if bill,isPositive
+                                td.positive= bill.profit
+                            else
+                                td.negetive= bill.profit
+                    

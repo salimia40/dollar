@@ -1,0 +1,39 @@
+doctype html
+html
+    include ./head.pug
+    body
+        div.container.mt-5
+            div.row
+                div.col-sm 
+                    div logo here
+                    div= appname
+
+                div.col-sm 
+                    b فاکتور های باز  #{name}
+        
+            table.table.mt-5.table-striped.table-light
+                thead.thead-dark
+                    tr
+                        th(scope ="col") #
+                        th(scope ="col") خرید-فروش 
+                        th(scope ="col") تعداد واحد
+                        th(scope ="col") قیمت
+                        th(scope ="col") کد معامله
+                tbody
+                    each bill, index in bills
+                        tr
+                            th(scope ="row")= index
+                            if bill.isSell
+                                td.sell فروش
+                            else
+                                td.buy خرید
+                            td= bill.left
+                            td= bill.price
+                            td= bill.code
+                    tr
+                    tr
+                        th(scope ="row")
+                        td جمع کل
+                        td= amount
+                        td میانگین قیمت: #{avrage}
+                        td مظنه حراجی: #{awkwardness}

@@ -1,0 +1,25 @@
+* {
+    text-align: center;
+    direction: rtl;
+}
+
+.sell {
+    background-color: red;
+    font-weight: 600;
+    color: white;
+}
+
+.buy {
+    background-color: green;
+    color: white;
+    font-weight: 600;
+}
+
+.positive {
+    background-color: rgb(105, 218, 101);
+    color: darkgreen;
+}
+.negetive {
+    background-color: rgb(230, 193, 92);
+    color: darkred;
+}

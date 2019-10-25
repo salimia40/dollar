@@ -1,0 +1,38 @@
+doctype html
+html
+    include ./head.pug
+    body
+        div.container.mt-5
+            div.row
+                div.col-sm logo here
+                div.col-sm 
+                    b لیست کاربران #{appname}
+        
+            table.table.mt-5.table-striped.table-light
+                thead.thead-dark
+                    tr
+                        th(scope ="col") شماره کاربری
+                        th(scope ="col") نقش
+                        th(scope ="col") نام و نام خانوادگی
+                        th(scope ="col") نام کاربری
+                        th(scope ="col") شماره تماس
+                        th(scope ="col") موجودی 
+                tbody
+                    each user in users
+                        tr
+                            th(scope ="row") #{user.userId}
+                            case user.role
+                                when "bot-owner"
+                                    td مالک
+                                when "bot-admin"
+                                    td مدیر
+                                when "bot-eccountant"
+                                    td حسابدار
+                                when "bot-vip"
+                                    td کاربر vip
+                                when "bot-member"
+                                    td کاربر معمولی
+                            td= user.name
+                            td= user.username
+                            td= user.phone
+                            td= user.charge * 1000

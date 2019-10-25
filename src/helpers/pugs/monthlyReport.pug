@@ -1,0 +1,38 @@
+doctype html
+html
+    include ./head.pug
+    body
+        div.container.mt-5
+            div.row
+                div.col-sm 
+                    div logo here
+                    div= appname
+
+                div.col-sm 
+                    b گزارش ماهانه  #{name}
+        
+            table.table.mt-5.table-striped.table-light
+                thead.thead-dark
+                    tr
+                        th(scope ="col") #
+                        th(scope ="col") تاریخ تسویه 
+                        th(scope ="col") نرخ تسویه
+                        th(scope ="col") سود و زیان
+                        th(scope ="col") مجموع کمیسیون پرداختی
+                        th(scope ="col") خالص
+                tbody
+                    each settle, index in settles
+                        tr
+                            th(scope ="row")= index
+                            td= settle.date
+                            td= settle.price
+                            td= settle.code
+                            td= settle.profit
+                            td= settle.commition
+                            td= settle.total
+                    tr
+                    tr
+                        th(scope ="row",colspan="3") جمع کل
+                        td= profit
+                        td= commition
+                        td= total
