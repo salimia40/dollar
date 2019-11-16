@@ -62,7 +62,8 @@ scene.hears(
         userId: user.userId,
         // closed: true,
         expired: false,
-        settled: false
+        settled: false,
+        due: 0
       })
 
       var comm = commition
@@ -150,22 +151,46 @@ x مقدار  x  : x واحد به قیمت : x
         
 💶 موجودی شما برابر است با : x`
 
+pallet = `سلام آقا/خانم x
+
+شما روز date
+
+با تسویه آبشده به نرخ price
+
+مبلغ : profit تومان.
+
+x کرده اید
+
+جهت تسویه حساب لطفا مبلغ ضرر خود را تا ساعت 15 به شماره حسابهای زیر واریز نمایید و رسید واریزی را به خصوصی حسابدار بفرستید.
+معامله گرانی که درخواست دریافت سود خود را دارند لطفا تا
+ساعت 14 به حسابداری اطلاع دهند.
+بانك ملت بنام حكيمه پَرَن
+شماره كارت 6104-3375-6968-8821
+شماره حساب 4647608171
+
+بانك صادرات بنام سيدعلي موسوي
+شماره كارت ‎6037-6974-6460-1779
+شماره حساب 0333677670009
+لطفا بعد از واريز حتما عکس فيش را با شماره پيگيري كه در فيش درج شده است ارسال كنيد.
+با تشکر مديريت معاملات پرديس`
+
+
+      // var umsg = pallet
+      //   .replace('x', user.name)
+      //   .replace('x', isSell ? '🔴' : '🔵')
+      //   .replace('x', isSell ? 'فروش' : 'خرید')
+      //   .replace('x', sold)
+      //   .replace('x', helpers.toman(c))
+      //   .replace('x', helpers.toman(prf))
+      //   .replace('x', d)
+      //   .replace('x', helpers.toman(user.charge))
 
       var umsg = pallet
-        .replace('x', user.name)
-        .replace('x', isSell ? '🔴' : '🔵')
-        .replace('x', isSell ? 'فروش' : 'خرید')
-        .replace('x', sold)
-        .replace('x', helpers.toman(c))
-        .replace('x', helpers.toman(prf))
-        .replace('x', d)
-        .replace('x', helpers.toman(user.charge))
-
-      //  config.samples.settleMsg
-      //     .replace('x', helpers.dateToString(settle.date))
-      //     .replace('x', helpers.toman(c))
-      //     .replace('x', helpers.toman(prf))
-      //     .replace('x', d)
+      .replace('x', user.name)
+          .replace('date', helpers.dateToString(settle.date))
+          .replace('price', helpers.toman(c))
+          .replace('profit', helpers.toman(prf))
+          .replace('x', d)
 
       ctx.telegram.sendMessage(user.userId, umsg)
     })

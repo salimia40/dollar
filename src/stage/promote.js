@@ -48,7 +48,7 @@ scene.hears(/\d+/, async(ctx, next) => {
                     {text:'کاربر معمولی', callback_data: `${config.role_member}:${user.userId}`},
                     {text:'کاربر مدیر', callback_data: `${config.role_admin}:${user.userId}`},
                     {text:'حسابدار', callback_data: `${config.role_eccountant}:${user.userId}`},
-                    {text:'کاربر vip', callback_data: `${config.role_vip}:${user.userId}`},
+                    // {text:'کاربر vip', callback_data: `${config.role_vip}:${user.userId}`},
                 ]]
             }
         })

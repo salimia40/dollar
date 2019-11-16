@@ -46,6 +46,15 @@ const opfImage = async (ctx, opfs) => {
       deal = 'خرید'
     }
 
+    switch (bill.due) {
+      case 0 : deal += ' امروزی' 
+      break
+      case 1 : deal += ' فردایی' 
+      break
+      case 2 : deal += ' پسفردایی' 
+      break
+    }
+    
     rows += config.templates.opfRow
       .replace('INDEX', ++i)
       .replace('DEAL-STYLE', style)
@@ -356,7 +365,7 @@ const closeDeals = async (ctx, b, price) => {
     closed: true,
     expired: false,
     isSell: !b.isSell,
-    type: b.type,
+    // type: b.type,
     due: b.due,
     left: {
       $gt: 0
@@ -448,18 +457,18 @@ const announceBill = async (ctx, bill, expire = true) => {
       break
   }
 
-  var type
-  switch (bill.type) {
-    case 0:
-      type = 'معمولی'
-      break
-    case 1:
-      type = 'بالا'
-      break
-    case -1:
-      type = 'پایین'
-      break
-  }
+  var type = ''
+  // switch (bill.type) {
+  //   case 0:
+  //     type = 'معمولی'
+  //     break
+  //   case 1:
+  //     type = 'بالا'
+  //     break
+  //   case -1:
+  //     type = 'پایین'
+  //     break
+  // }
 
   var group = await ctx.setting.getActiveGroup()
 
@@ -518,7 +527,7 @@ const makeDeal = async ctx => {
         left: amount,
         sellerId,
         buyerId,
-        type,
+        // type,
         due
       })
     } else {
@@ -534,7 +543,7 @@ const makeDeal = async ctx => {
         buyerId,
         amount: amount,
         price: price,
-        type,
+        // type,
         due
       })
 
@@ -555,7 +564,7 @@ const makeDeal = async ctx => {
       amount: amount,
       date: Date.now(),
       price: price,
-      type,
+      // type,
       due
     })
   } else {
@@ -569,7 +578,7 @@ const makeDeal = async ctx => {
         left: amount,
         sellerId,
         buyerId,
-        type,
+        // type,
         due
       })
     } else {
@@ -585,7 +594,7 @@ const makeDeal = async ctx => {
         buyerId,
         amount: amount,
         price: price,
-        type,
+        // type,
         due
       })
       /**update bill */
@@ -605,7 +614,7 @@ const makeDeal = async ctx => {
       buyerId,
       amount: amount,
       price: price,
-      type,
+      // type,
       due
     })
   }

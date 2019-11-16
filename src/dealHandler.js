@@ -7,45 +7,41 @@ const moment = require('moment')
 
 const handler = new Composer()
 
-isTimeBetween = function(aStartTime = '00:00', anEndTime = '12:30', aCurrTime)
-{
-    // you may pass in aCurrTime or use the *actual* current time
-    var currentTime = !aCurrTime ? moment() : moment(aCurrTime, "HH:mm a");
-    var startTime = moment(aStartTime, "HH:mm a");
-    var endTime = moment(anEndTime, "HH:mm a");
+isTimeBetween = function(aStartTime = '00:00', anEndTime = '12:30', aCurrTime) {
+  // you may pass in aCurrTime or use the *actual* current time
+  var currentTime = !aCurrTime ? moment() : moment(aCurrTime, 'HH:mm a')
+  var startTime = moment(aStartTime, 'HH:mm a')
+  var endTime = moment(anEndTime, 'HH:mm a')
 
-    if (startTime.hour() >=12 && endTime.hour() <=12 )
-    {
-        endTime.add(1, "days");       // handle spanning days
-    }
+  if (startTime.hour() >= 12 && endTime.hour() <= 12) {
+    endTime.add(1, 'days') // handle spanning days
+  }
 
-    return currentTime.isBetween(startTime, endTime);
-    }
+  return currentTime.isBetween(startTime, endTime)
+}
 
-const parsLafz = (l) => {
-  l = l.replace(/\s/,'')
-  const regex = /(ا|ف|پس|)(\d+)(خ|ف)(\d+)(ب|پ|)/
-  if(! regex.test(l)) return false
+const parsLafz = l => {
+  l = l.replace(/\s/, '')
+  // const regex = /(ا|ف|پس|)(\d+)(خ|ف)(\d+)(ب|پ|)/
+  const regex = /(\d+)(خ|ف)(\d+)(ا|ف|پس|)/
+  if (!regex.test(l)) return false
   var match = regex.exec(l)
   return {
-      due : (() => {
-        switch (match[1])  {
-          case  'ا': return 0
-          case  'ف': return 1
-          case  'پس': return 2
-          case  '': return isTimeBetween() ? 0 : 1
-        }
-      })(),
-      amount : +match[2],
-      isSell : match[3] == 'ف',
-      price : +match[4],
-      type : (() => {
-        switch (match[5])  {
-          case  '': return 0
-          case  'ب': return 1
-          case  'پ': return -1
-        }
-      })(),
+    price: +match[1],
+    isSell: match[2] == 'ف',
+    amount: +match[3],
+    due: (() => {
+      switch (match[4]) {
+        case 'ا':
+          return 0
+        case 'ف':
+          return 1
+        case 'پس':
+          return 2
+        case '':
+          return isTimeBetween() ? 0 : 1
+      }
+    })()
   }
 }
 
@@ -67,7 +63,7 @@ handler.hears(
   async (ctx, next) => {
     var l = parsLafz(ctx.match.input)
     console.log(l)
-    if(l){
+    if (l) {
       ctx.lafz = l
       next()
     }

@@ -199,7 +199,8 @@ module.exports = {
       [keys.openfacts, keys.monthlyReport],
       [keys.postSettleReport, keys.semiSettle],
       [keys.packInv, keys.changeInv],
-      [keys.userInfo, keys.contact]
+      [keys.userInfo, keys.myReferLink],
+      [keys.contact]
     ]
     if (
       ctx.user.role == config.role_owner ||
@@ -360,7 +361,7 @@ module.exports = {
             [akeys.activateAuto, akeys.activateFaker],
             [akeys.deactivateAuto, akeys.deactivateFaker],
             [akeys.setBotCard, akeys.getSettings, akeys.dobock],
-
+            [akeys.decdue],
             [keys.back]
           ])
             .resize()
@@ -404,8 +405,8 @@ module.exports = {
       'مدیریت کاربران',
       Markup.keyboard([
         [akeys.showEccountant, akeys.changeRole, akeys.showAdmins],
-        [akeys.setVipOff, akeys.showVips, akeys.allUsers],
-        [akeys.viewUser, akeys.sentToUser, akeys.editUser],
+        [akeys.allUsers, akeys.viewUser],
+        [akeys.sentToUser, akeys.editUser],
         [keys.manage, keys.back]
       ])
         .resize()
@@ -537,7 +538,8 @@ module.exports = {
     let mx = await helpers.maxCanSell(ctx, false)
     let mcb = await helpers.maxCanBuy(ctx, false)
 
-    let mt = helpers.matchTolerance(price, type)
+    let mt = helpers.matchTolerance(price, 0)
+    console.log(mt)
     let bc =
       ctx.user.config.baseCharge == -1
         ? ctx.setting.getBaseCharge()
@@ -628,20 +630,21 @@ module.exports = {
     //     console.log('offer is over')
     //   }
     // } else {
-      // find matching offers and close deal
+    // find matching offers and close deal
 
-      let c = await ctx.setting.getCode()
-      bill = new Bill({
-        code: c,
-        userId: ctx.user.userId,
-        amount: amount,
-        left: amount,
-        price: price,
-        isSell: isSell,
-        type,due
-      })
-      bill = await bill.save()
-      helpers.announceBill(ctx, bill)
+    let c = await ctx.setting.getCode()
+    bill = new Bill({
+      code: c,
+      userId: ctx.user.userId,
+      amount: amount,
+      left: amount,
+      price: price,
+      isSell: isSell,
+      type,
+      due
+    })
+    bill = await bill.save()
+    helpers.announceBill(ctx, bill)
     // }
   },
   offerByAmount: Telegraf.branch(
@@ -699,7 +702,7 @@ module.exports = {
         }
 
         let price = bill.price
-        let type = bill.type
+        // let type = bill.type
         let due = bill.due
         let sellerId, buyerId
         if (isSell) {
@@ -717,7 +720,7 @@ module.exports = {
           amount,
           price,
           bill,
-          type,
+          // type,
           due
         }
 

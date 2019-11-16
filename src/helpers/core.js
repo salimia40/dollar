@@ -17,7 +17,7 @@ const toman = v => {
     return v.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   }
 
-const matchTolerance = (price, type) => {
+const matchTolerance = (price, type = 0) => {
   var tol = setting.getTolerance()
   var q = setting.getQuotation()
   var min = q - tol

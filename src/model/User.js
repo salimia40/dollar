@@ -73,12 +73,12 @@ const userSchema = new Schema({
     default: shortid.generate()
   },
   refers: {
-    referer: String,
+    referer: Number,
     asked: {
       type: Boolean,
       default: false
     },
-    refers: [String]
+    refers: [Number]
   },
   acceptedTerms: {
     type: Boolean,
