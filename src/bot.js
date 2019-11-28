@@ -297,8 +297,10 @@ module.exports = async token => {
   )
 
   bot.action(keys.eccountant, privateMiddleWare, hears.sendEccountant)
-  bot.action(keys.support, privateMiddleWare, enter('supportScene'))
-  bot.hears(keys.sendDocs, privateMiddleWare, enter('docsScene'))
+  // bot.action(keys.support, privateMiddleWare, enter('supportScene'))
+  bot.action(keys.support, privateMiddleWare, (ctx) => ctx.reply(`جهت ارتباط با پشتیبانی @Arz_online_support 
+  و جهت ارتباط با حسابدار @hesabdar2244`))
+  // bot.hears(keys.sendDocs, privateMiddleWare, enter('docsScene'))
 
   bot.action(
     /bot-admin:\d+/,
@@ -378,21 +380,21 @@ module.exports = async token => {
   bot.hears(keys.reqCash, privateMiddleWare, hears.reqCash)
   bot.hears(keys.reqRESIVEGOLG, privateMiddleWare, enter('reqRESIVEGOLG'))
 
-  bot.hears(keys.myReferLink, async ctx => {
-    console.log(ctx.user.refers)
-    ctx.reply(
-      `لینک دعوت شما: \n https://t.me/${ctx.botInfo.username}?start=${ctx.user.referId}`
-    )
-    if (ctx.user.refers.refers.length > 0) {
-      var msg = `دعوت های شما:`
-      while (ctx.user.refers.refers.length > 0) {
-        var uid = ctx.user.refers.refers.pop()
-        var user = await User.findById(uid)
-        msg += `\n  ${user.userId}  ${user.name} `
-      }
-      ctx.reply(msg)
-    }
-  })
+  // bot.hears(keys.myReferLink, async ctx => {
+  //   console.log(ctx.user.refers)
+  //   ctx.reply(
+  //     `لینک دعوت شما: \n https://t.me/${ctx.botInfo.username}?start=${ctx.user.referId}`
+  //   )
+  //   if (ctx.user.refers.refers.length > 0) {
+  //     var msg = `دعوت های شما:`
+  //     while (ctx.user.refers.refers.length > 0) {
+  //       var uid = ctx.user.refers.refers.pop()
+  //       var user = await User.findById(uid)
+  //       msg += `\n  ${user.userId}  ${user.name} `
+  //     }
+  //     ctx.reply(msg)
+  //   }
+  // })
 
   bot.hears(keys.transactions, privateMiddleWare, async ctx => {
     var transactions = await Transaction.find({
