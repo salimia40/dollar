@@ -231,7 +231,7 @@ module.exports = async token => {
   bot.use(stage.middleware())
 
   // dont filter messages if its in scenes
-  bot.use(middlewares.filterMessages)
+  // bot.use(middlewares.filterMessages)
 
   bot.use(middlewares.checkUserCompleted)
 

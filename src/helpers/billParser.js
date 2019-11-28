@@ -228,7 +228,9 @@ const billToSring = async (bill, result) => {
       tot = Math.abs(tot)
       awkpart = awkMsg
       .replace('x',tot)
-      .replace('x',avg)
+      .replace('x',avg > 0 ? 'فروش': 'خرید')
+      .replace('x',avg > 0 ? 'فروش': 'خرید')
+      .replace('x',Math.abs(avg))
       .replace('x',toman(bill.awkwardness.awk))
       .replace('x',toman(bill.awkwardness.sellprice))
   }

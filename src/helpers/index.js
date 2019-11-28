@@ -257,11 +257,13 @@ const countAwkwardness = async (ctx, bill) => {
   await asyncForEach(obills, s => {
     if (s.isSell) oss += s.left
     else oss -= s.left
-    avg += s.left * s.price
+    avg += (s.isSell ? s.left : 0 - s.left) * s.price
   })
 
   avg /= oss
   var isSell = oss > 0
+
+  console.log('oss is' + oss)
 
   if (oss == 0) {
     user.awkwardness = {
