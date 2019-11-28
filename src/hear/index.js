@@ -311,7 +311,7 @@ module.exports = {
     if (count < 0) {
       msg = `${Math.abs(count)}  واحد فروش`
     } else if (count == 0) {
-      msg = `صفر واحد طلا`
+      msg = `صفر واحد`
     } else msg = `${Math.abs(count)}  واحد خرید`
 
     var es =
@@ -553,13 +553,13 @@ module.exports = {
     if (!isSell && amount > mcb) {
       return ctx.telegram.sendMessage(
         ctx.message.from.id,
-        'شما به حد اکثر میزان توانایی خرید خود رسیده اید\n اکانت خود را شارژ کرده یا موجودی آبشده خودتان را بفروشید'
+        'شما به حد اکثر میزان توانایی خرید خود رسیده اید\n اکانت خود را شارژ کرده'
       )
     }
     if (isSell && amount > mx) {
       return ctx.telegram.sendMessage(
         ctx.message.from.id,
-        'شما به حد اکثر میزان توانایی فروش خود رسیده اید\n اکانت خود را شارژ کرده یا موجودی آبشده بخرید'
+        'شما به حد اکثر میزان توانایی فروش خود رسیده اید\n اکانت خود را شارژ کرده'
       )
     }
     if (!helpers.isComplete(ctx)) {
@@ -635,6 +635,7 @@ module.exports = {
     let c = await ctx.setting.getCode()
     bill = new Bill({
       code: c,
+      messageId: ctx.message.message_id,
       userId: ctx.user.userId,
       amount: amount,
       left: amount,
@@ -644,7 +645,7 @@ module.exports = {
       due
     })
     bill = await bill.save()
-    helpers.announceBill(ctx, bill)
+    // helpers.announceBill(ctx, bill) 
     // }
   },
   offerByAmount: Telegraf.branch(
@@ -685,13 +686,13 @@ module.exports = {
         if (!isSell && amount > mcb) {
           return ctx.telegram.sendMessage(
             ctx.message.from.id,
-            'شما به حد اکثر میزان توانایی خرید خود رسیده اید\n اکانت خود را شارژ کرده یا موجودی آبشده خودتان را بفروشید'
+            'شما به حد اکثر میزان توانایی خرید خود رسیده اید\n اکانت خود را شارژ کرده'
           )
         }
         if (isSell && amount > mx) {
           return ctx.telegram.sendMessage(
             ctx.message.from.id,
-            'شما به حد اکثر میزان توانایی فروش خود رسیده اید\n اکانت خود را شارژ کرده یا موجودی آبشده بخرید'
+            'شما به حد اکثر میزان توانایی فروش خود رسیده اید\n اکانت خود را شارژ کرده'
           )
         }
         if (!helpers.isComplete(ctx)) {

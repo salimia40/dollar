@@ -3,6 +3,7 @@ const queue = require('./queue')
 const config = require('./config')
 const hears = require('./hear')
 const helpers = require('./helpers')
+const Setting = require('./model/Setting')
 const moment = require('moment')
 
 const handler = new Composer()
@@ -27,7 +28,17 @@ const parsLafz = l => {
   if (!regex.test(l)) return false
   var match = regex.exec(l)
   return {
-    price: +match[1],
+    price: (() => {
+      var q = `${Setting.getQuotation()}`
+      var pr = match[1]
+      var final = ''
+      while(q.length > pr.length) {
+        final += q[0]
+        q = q.slice(1)
+      }
+      final += pr
+      return +final
+    })(),
     isSell: match[2] == 'ف',
     amount: +match[3],
     due: (() => {

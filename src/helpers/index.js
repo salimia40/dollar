@@ -646,8 +646,8 @@ const makeDeal = async ctx => {
   suser.charge += selRes.totalProfit
   suser.charge -= selRes.totalCommition
 
-  suser.block = await recountBlock(suser.block, amount, true, suser.userId)
-  buser.block = await recountBlock(buser.block, amount, false, buser.userId)
+  // suser.block = await recountBlock(suser.block, amount, true, suser.userId)
+  // buser.block = await recountBlock(buser.block, amount, false, buser.userId)
 
   await buser.save()
   await suser.save()
@@ -782,7 +782,6 @@ const billPrev = async bill => {
         }
       })()
     )
-    .replace('x', dateToString(bill.date))
     .replace('x', bill.code)
   return m
 }

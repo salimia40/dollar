@@ -27,4 +27,19 @@ isTimeBetween = function(aStartTime = '00:00', anEndTime = '12:30', aCurrTime) {
   return isBetween
 }
 
-console.log(isTimeBetween('12:00'))
+// console.log(isTimeBetween('12:00'))
+
+const relence = () => {
+  var q = `14300`
+  var pr = '23700'
+  // if (q.length == pr.length) return +pr
+  var final = ''
+  while (q.length > pr.length) {
+    final += q[0]
+    q = q.slice(1)
+  }
+  final += pr
+  return +final
+}
+
+console.log(relence())

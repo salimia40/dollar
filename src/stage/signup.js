@@ -72,7 +72,7 @@ const inputHandler = async (ctx, next) => {
     console.log(ctx.session.docsConfirmed)
 
     if (user.name == undefined) {
-      ctx.reply('نام و نام خانوادگی (نام و نام خانوادگی حقیقی خود را واردکنید)')
+      ctx.reply('لطفا نام و نام خانوادگی خود را واردکنید')
       ctx.session.stage = 'nameAsked'
     } else if (user.username == undefined) {
       ctx.reply(
@@ -100,24 +100,26 @@ const inputHandler = async (ctx, next) => {
           .extra()
       )
       ctx.session.stage = 'bankNameAsked'
-    } else if (user.docs.length == 0 && !ctx.session.docsConfirmed) {
-      ctx.session.stage = 'docsAsked'
-      await ctx.reply(
-        'لطفا مدارک خود را  به صورت تصویر ارسال  کنید ( کپی کارت ملی یا پروانه کسب یا صفحه اول شناسنامه یا کارت پایان خدمت) و هنگام اتمام دکمه ثبت را بزنید:',
-        {
-          reply_markup: {
-            inline_keyboard: [
-              [
-                {
-                  text: 'ثبت مدارک',
-                  callback_data: 'confirm-docs'
-                }
-              ]
-            ]
-          }
-        }
-      )
-    } else if (!user.acceptedTerms) {
+    } 
+    // else if (user.docs.length == 0 && !ctx.session.docsConfirmed) {
+    //   ctx.session.stage = 'docsAsked'
+    //   await ctx.reply(
+    //     'لطفا مدارک خود را  به صورت تصویر ارسال  کنید ( کپی کارت ملی یا پروانه کسب یا صفحه اول شناسنامه یا کارت پایان خدمت) و هنگام اتمام دکمه ثبت را بزنید:',
+    //     {
+    //       reply_markup: {
+    //         inline_keyboard: [
+    //           [
+    //             {
+    //               text: 'ثبت مدارک',
+    //               callback_data: 'confirm-docs'
+    //             }
+    //           ]
+    //         ]
+    //       }
+    //     }
+    //   )
+    // } 
+    else if (!user.acceptedTerms) {
       await helpers.asyncForEach(config.contract, async c => {
         await ctx.reply(c)
       })

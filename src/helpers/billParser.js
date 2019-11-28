@@ -220,20 +220,9 @@ const billToSring = async (bill, result) => {
   🔘 میانگین فاکتور x: x
   ⛔️ چناچه قیمت مظنه به : x برسد فاکتور خرید شما به قیمت: x حراج می شود.
   `
-  
-
-  res = sample
-  .replace('x',user.name)
-  .replace('x',bill.isSell ? '🔴' :'🔵')
-  .replace('x',bill.isSell ? 'فروش' :'خرید')
-  .replace('x',bill.amount)
-  .replace('x',bill.price)
-  .replace('x',final)
-  .replace('x',ft)
-  .replace('x',toman(user.charge))
 
   var awkpart = ''
-
+  
   if (tot != 0) {
       isSell = tot > 0
       tot = Math.abs(tot)
@@ -244,9 +233,16 @@ const billToSring = async (bill, result) => {
       .replace('x',toman(bill.awkwardness.sellprice))
   }
 
-  console.log(awkpart)
-
-  res.replace('z',awkpart)
+  res = sample
+  .replace('x',user.name)
+  .replace('x',bill.isSell ? '🔴' :'🔵')
+  .replace('x',bill.isSell ? 'فروش' :'خرید')
+  .replace('x',bill.amount)
+  .replace('x',bill.price)
+  .replace('x',final)
+  .replace('x',ft)
+  .replace('x',toman(user.charge))
+  .replace('z',awkpart)
 
   return res
 }
