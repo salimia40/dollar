@@ -19,6 +19,7 @@ module.exports = async token => {
     akeys = config.adminKeys,
     cron = require('./cron')
 
+    
   bot.catch(err => {
     console.error('Ooops', err)
   })
@@ -236,7 +237,7 @@ module.exports = async token => {
   bot.use(middlewares.checkUserCompleted)
 
   // commands
-  const StartHandler = require('./startHandler')
+  // const StartHandler = require('./startHandler')
   bot.start(command.start, enter('singnupScene'))
   // signup scene
   // StartHandler)
@@ -344,8 +345,6 @@ module.exports = async token => {
         [akeys.sendToGroup, akeys.sendToUsers, akeys.manageUsers],
         [akeys.showFac, akeys.activate, akeys.activateCashRec],
         [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
-        [akeys.activateAuto, akeys.activateFaker],
-        [akeys.deactivateAuto, akeys.deactivateFaker],
         [akeys.setBotCard, akeys.getSettings, akeys.dobock],
         [keys.back]
       ])

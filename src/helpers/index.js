@@ -860,6 +860,7 @@ const checkAwk = async (ctx, user) => {
   var bills = await Bill.find({
     closed: true,
     userId: user.userId,
+    due: 0,
     left: {
       $gt: 0
     }
@@ -934,6 +935,7 @@ const doAwk = async (ctx, v) => {
   await asyncForEach(users, async user => {
     var bills = await Bill.find({
       closed: true,
+      due : 0,
       userId: user.userId,
       left: {
         $gt: 0

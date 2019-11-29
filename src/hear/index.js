@@ -357,9 +357,8 @@ module.exports = {
             [akeys.sendToGroup, akeys.sendToUsers, akeys.manageUsers],
             [akeys.showFac, akeys.activate, akeys.activateCashRec],
             [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
-            [akeys.activateAuto, akeys.activateFaker],
-            [akeys.deactivateAuto, akeys.deactivateFaker],
-            [akeys.setBotCard, akeys.getSettings, akeys.dobock],
+            [akeys.activateAuto, akeys.deactivateAuto],
+            [akeys.setBotCard, akeys.getSettings],
             [akeys.decdue],
             [keys.back]
           ])
@@ -656,7 +655,7 @@ module.exports = {
           messageId: ctx.message.reply_to_message.message_id
         })
         if (bill == undefined || bill.closed || bill.expired) {
-          faker.forceDeal(ctx.message.reply_to_message.message_id)
+          // faker.forceDeal(ctx.message.reply_to_message.message_id)
           return
         }
         let amount = +ctx.match[0]

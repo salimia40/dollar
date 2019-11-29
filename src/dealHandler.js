@@ -58,19 +58,19 @@ const parsLafz = l => {
 
 handler.hears(
   /\d+\s*(ف|خ)\s*\d+/,
-  async (ctx, next) => {
-    if (
-      ctx.user.role == config.role_admin ||
-      ctx.user.role == config.role_owner
-    ) {
-      try {
-        ctx.deleteMessage()
-      } catch (error) {
-        //
-      }
-    }
-    next()
-  },
+  // async (ctx, next) => {
+  //   if (
+  //     ctx.user.role == config.role_admin ||
+  //     ctx.user.role == config.role_owner
+  //   ) {
+  //     try {
+  //       ctx.deleteMessage()
+  //     } catch (error) {
+  //       //
+  //     }
+  //   }
+  //   next()
+  // },
   async (ctx, next) => {
     var l = parsLafz(ctx.match.input)
     console.log(l)
@@ -86,19 +86,19 @@ handler.hears(
 
 handler.hears(
   /^\d+$/,
-  async (ctx, next) => {
-    if (
-      ctx.user.role == config.role_owner ||
-      ctx.user.role == config.role_admin
-    ) {
-      try {
-        ctx.deleteMessage()
-      } catch (error) {
-        //
-      }
-    }
-    next()
-  },
+  // async (ctx, next) => {
+  //   if (
+  //     ctx.user.role == config.role_owner ||
+  //     ctx.user.role == config.role_admin
+  //   ) {
+  //     try {
+  //       ctx.deleteMessage()
+  //     } catch (error) {
+  //       //
+  //     }
+  //   }
+  //   next()
+  // },
   hears.offerByAmount
 )
 
