@@ -296,7 +296,7 @@ module.exports = async token => {
     enter('singnupScene')
   )
 
-  bot.action(keys.eccountant, privateMiddleWare, hears.sendEccountant)
+  bot.hears(keys.eccountant, privateMiddleWare, hears.sendEccountant)
   // bot.action(keys.support, privateMiddleWare, enter('supportScene'))
   bot.action(keys.support, privateMiddleWare, (ctx) => ctx.reply(`جهت ارتباط با پشتیبانی @Arz_online_support 
   و جهت ارتباط با حسابدار @hesabdar2244`))
@@ -731,6 +731,14 @@ module.exports = async token => {
         var bill = bills.pop()
         bill.due--
         await bill.save()
+    }
+    var users = await User.find()
+    
+    await ctx.reply('در حال محاسبه مجدد فاکتور حراج')
+    while (users.length > 0) {
+      var user = users.pop()
+      var res = await helpers.countAwkwardness(null,null,user)
+      // todo snd a message to user
     }
     await ctx.reply('تبدیل فردایی به امروزی به اتمام رسید')
   })

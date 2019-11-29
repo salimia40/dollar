@@ -47,14 +47,17 @@ const opfImage = async (ctx, opfs) => {
     }
 
     switch (bill.due) {
-      case 0 : deal += ' امروزی' 
-      break
-      case 1 : deal += ' فردایی' 
-      break
-      case 2 : deal += ' پسفردایی' 
-      break
+      case 0:
+        deal += ' امروزی'
+        break
+      case 1:
+        deal += ' فردایی'
+        break
+      case 2:
+        deal += ' پسفردایی'
+        break
     }
-    
+
     rows += config.templates.opfRow
       .replace('INDEX', ++i)
       .replace('DEAL-STYLE', style)
@@ -236,11 +239,12 @@ const isGroupAdmin = async (ctx, botUser) => {
   })
   return isBdmin
 }
-const countAwkwardness = async (ctx, bill) => {
+const countAwkwardness = async (ctx, bill, user) => {
   var awk
-  var user = await User.findOne({
-    userId: bill.userId
-  })
+  if (!user)
+    user = await User.findOne({
+      userId: bill.userId
+    })
 
   var obills = await Bill.find({
     userId: user.userId,
@@ -804,7 +808,7 @@ const onCharge = async userId => {
     isSell: isSell
   })
 
-   var oss = 0
+  var oss = 0
 
   var avg = 0
   await asyncForEach(obills, s => {
@@ -1006,7 +1010,7 @@ const doAwk = async (ctx, v) => {
 const setQuotation = async (ctx, v) => {
   ctx.setting.setQuotation(v)
   let group = await ctx.setting.getActiveGroup()
-  var res = await assistant.sendMessage(group, `💫 مظنه: ${v} 💫`)
+  var res = await assistant.sendMessage(group, `🔸 مظنه: ${v} 🔸`)
   console.log(res)
 
   console.log(group)

@@ -30,7 +30,7 @@ scene.hears(/\d+/, async(ctx, next) => {
     let group = await ctx.setting.getActiveGroup()
     // ctx.reply(JSON.parse(groups))
     console.log(group)
-    assistant.sendMessage(group, `💫 تلورانس: ${c} 💫`)
+    assistant.sendMessage(group, `🔸 تلورانس: ${c} 🔸`)
     next()
 },leave())
 

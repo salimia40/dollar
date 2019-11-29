@@ -186,7 +186,7 @@ module.exports = {
         [keys.summitResipt, keys.reqCash],
         [keys.reqCard, keys.cardInfo],
         [keys.transactions, keys.help],
-        [keys.sendDocs, keys.contactManager],
+        [keys.sendDocs, keys.support],
         [keys.back]
       ])
         .resize()
@@ -199,8 +199,8 @@ module.exports = {
       [keys.openfacts, keys.monthlyReport],
       [keys.postSettleReport, keys.semiSettle],
       [keys.packInv, keys.changeInv],
-      [keys.userInfo, keys.myReferLink],
-      [keys.contact]
+      [keys.userInfo, keys.help],
+      [keys.eccountant]
     ]
     if (
       ctx.user.role == config.role_owner ||
