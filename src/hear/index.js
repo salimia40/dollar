@@ -176,18 +176,17 @@ module.exports = {
     }
   ),
   sendEccountant: ctx => {
-    ctx.telegram.deleteMessage(
-      ctx.callbackQuery.message.chat.id,
-      ctx.callbackQuery.message.message_id
-    )
+    // ctx.telegram.deleteMessage(
+    //   ctx.callbackQuery.message.chat.id,
+    //   ctx.callbackQuery.message.message_id
+    // )
     ctx.reply(
       'عملیات مورد نظر را انتخاب کنید:',
       Markup.keyboard([
         [keys.summitResipt, keys.reqCash],
         [keys.reqCard, keys.cardInfo],
         [keys.transactions, keys.help],
-        [keys.sendDocs, keys.support],
-        [keys.back]
+        [keys.back, keys.support],
       ])
         .resize()
         .extra()

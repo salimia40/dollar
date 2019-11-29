@@ -298,8 +298,11 @@ module.exports = async token => {
 
   bot.hears(keys.eccountant, privateMiddleWare, hears.sendEccountant)
   // bot.action(keys.support, privateMiddleWare, enter('supportScene'))
-  bot.action(keys.support, privateMiddleWare, (ctx) => ctx.reply(`جهت ارتباط با پشتیبانی @Arz_online_support 
-  و جهت ارتباط با حسابدار @hesabdar2244`))
+  bot.hears(keys.support, privateMiddleWare, ctx => {
+    console.log('support')
+    ctx.reply(`جهت ارتباط با پشتیبانی @Arz_online_support 
+  و جهت ارتباط با حسابدار @hesabdar2244`)
+  })
   // bot.hears(keys.sendDocs, privateMiddleWare, enter('docsScene'))
 
   bot.action(
@@ -726,18 +729,20 @@ module.exports = async token => {
       due: { $gt: 0 },
       left: { $gt: 0 }
     })
-    await ctx.reply(' در حال تبدیل فردایی به امروزی. تا اتمام عملیات از باز کردن گروه خودداری کنید.')
+    await ctx.reply(
+      ' در حال تبدیل فردایی به امروزی. تا اتمام عملیات از باز کردن گروه خودداری کنید.'
+    )
     while (bills.length > 0) {
-        var bill = bills.pop()
-        bill.due--
-        await bill.save()
+      var bill = bills.pop()
+      bill.due--
+      await bill.save()
     }
     var users = await User.find()
-    
+
     await ctx.reply('در حال محاسبه مجدد فاکتور حراج')
     while (users.length > 0) {
       var user = users.pop()
-      var res = await helpers.countAwkwardness(null,null,user)
+      var res = await helpers.countAwkwardness(null, null, user)
       // todo snd a message to user
     }
     await ctx.reply('تبدیل فردایی به امروزی به اتمام رسید')
