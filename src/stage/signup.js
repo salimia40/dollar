@@ -257,7 +257,7 @@ singnupScene.enter(async ctx => {
   console.log('inside signup bot')
   if (ctx.user.name == undefined) {
     ctx.reply(
-      'لطفا نام و نام خانوادگی  خود را واردکنید (مشخصات وارد شده باید با مشخصات مندرج بر کارت بانکی شما یکسان باشد)'
+      'لطفا نام و نام خانوادگی  خود را وارد کنید'
     )
     ctx.session.stage = 'nameAsked'
   }

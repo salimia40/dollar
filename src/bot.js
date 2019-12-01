@@ -232,7 +232,7 @@ module.exports = async token => {
   bot.use(stage.middleware())
 
   // dont filter messages if its in scenes
-  // bot.use(middlewares.filterMessages)
+  bot.use(middlewares.filterMessages)
 
   bot.use(middlewares.checkUserCompleted)
 
@@ -791,78 +791,78 @@ module.exports = async token => {
     ctx.deleteMessage()
   })
 
-  bot.action('dotheBlock', privateMiddleWare, ownerMiddleWare, async ctx => {
-    ctx.deleteMessage()
-    ctx.setting.deActivate()
-    ctx.reply('درحال انجام لطفا صبر کنید...')
+  // bot.action('dotheBlock', privateMiddleWare, ownerMiddleWare, async ctx => {
+  //   ctx.deleteMessage()
+  //   ctx.setting.deActivate()
+  //   ctx.reply('درحال انجام لطفا صبر کنید...')
 
-    var users = await User.find()
-    var amount = 0
+  //   var users = await User.find()
+  //   var amount = 0
 
-    for (var index = 0; index < users.length; index++) {
-      var user = users[index]
-      if (user == undefined) continue
-      if (user.role == config.role_owner || user.role == config.role_admin)
-        continue
+  //   for (var index = 0; index < users.length; index++) {
+  //     var user = users[index]
+  //     if (user == undefined) continue
+  //     if (user.role == config.role_owner || user.role == config.role_admin)
+  //       continue
 
-      var bills = await Bill.find({
-        closed: true,
-        userId: user.userId,
-        left: {
-          $gt: 0
-        }
-      })
-      var am = 0
+  //     var bills = await Bill.find({
+  //       closed: true,
+  //       userId: user.userId,
+  //       left: {
+  //         $gt: 0
+  //       }
+  //     })
+  //     var am = 0
 
-      while (bills.length > 0) {
-        var bill = bills.pop()
-        var x = bill.left
-        if (bill.isSell) {
-          am += x
-        } else {
-          am -= x
-        }
-      }
+  //     while (bills.length > 0) {
+  //       var bill = bills.pop()
+  //       var x = bill.left
+  //       if (bill.isSell) {
+  //         am += x
+  //       } else {
+  //         am -= x
+  //       }
+  //     }
 
-      var isSell = am > 0
-      am = Math.abs(am)
-      var diff = 0
-      if (user.block == undefined) {
-        user.block = {
-          isSell,
-          value: 0
-        }
-      }
-      if (user.block.value > 0 && user.block.isSell == isSell) {
-        if (am > user.block.value) {
-          diff = am - user.block.value
-        }
-      } else {
-        diff = am
-        user.block.isSell = isSell
-      }
-      user.block.value = am
+  //     var isSell = am > 0
+  //     am = Math.abs(am)
+  //     var diff = 0
+  //     if (user.block == undefined) {
+  //       user.block = {
+  //         isSell,
+  //         value: 0
+  //       }
+  //     }
+  //     if (user.block.value > 0 && user.block.isSell == isSell) {
+  //       if (am > user.block.value) {
+  //         diff = am - user.block.value
+  //       }
+  //     } else {
+  //       diff = am
+  //       user.block.isSell = isSell
+  //     }
+  //     user.block.value = am
 
-      amount += diff
+  //     amount += diff
 
-      user.charge -= diff * 5
+  //     user.charge -= diff * 5
 
-      if (diff > 0) {
-        var msg = config.samples.blockeMsg
-          .replace('x', user.name)
-          .replace('x', diff)
-          .replace('x', helpers.toman(diff * 5))
-        ctx.telegram.sendMessage(user.userId, msg)
-      }
-      user = await user.save()
-      await helpers.recieveUserCommitions({
-        amount: diff * 5,
-        userId: user.userId
-      })
-    }
+  //     if (diff > 0) {
+  //       var msg = config.samples.blockeMsg
+  //         .replace('x', user.name)
+  //         .replace('x', diff)
+  //         .replace('x', helpers.toman(diff * 5))
+  //       ctx.telegram.sendMessage(user.userId, msg)
+  //     }
+  //     user = await user.save()
+  //     await helpers.recieveUserCommitions({
+  //       amount: diff * 5,
+  //       userId: user.userId
+  //     })
+  //   }
 
-    ctx.reply(`انجام شد در مجموع ${amount} واحد بلوکه شد`)
-  })
+  //   ctx.reply(`انجام شد در مجموع ${amount} واحد بلوکه شد`)
+  // })
 
   bot.command('owner', async ctx => {
     if (ctx.user.role == config.role_owner) {
@@ -929,6 +929,7 @@ module.exports = async token => {
   bot.hears(/\d+\s*(ف|خ)\s*\d+/, dealHandler.pushToHandler)
 
   bot.hears(/^\d+$/, dealHandler.pushToHandler)
+  bot.hears(/^ب$/, dealHandler.pushToHandler)
 
   return bot
 }

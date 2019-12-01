@@ -12,7 +12,7 @@ const Markup = require('telegraf/markup')
 const scene = new Scene('semisettleScene')
 scene.enter(ctx => {
   ctx.reply(
-    'لطفا نرخ تسویه را به هزار تومان به صورت عددی وارد نمایید.',
+    'لطفا نرخ تسویه را به تومان به صورت عددی وارد نمایید.',
     Markup.inlineKeyboard([
       [
         {

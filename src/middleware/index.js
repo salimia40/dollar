@@ -48,11 +48,12 @@ module.exports = {
         next()
     },
     filterMessages: (ctx, next) => {
-        if(ctx.user.role == config.role_admin || ctx.user.role == config.role_bot_assistant || ctx.user.role == config.role_owner) return next()
+        // if(ctx.user.role == config.role_admin || ctx.user.role == config.role_bot_assistant || ctx.user.role == config.role_owner) return next()
         if (helpers.isPrivate(ctx)) {
             if (ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1) return next()
             else if (ctx.updateType == "callback_query") return next()
         } else {
+            if(( ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1 && /^.../.test(ctx.message.text))) return next()
             ctx.deleteMessage()
             if (ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1) return next()
             else if (ctx.updateType == "callback_query") return next()

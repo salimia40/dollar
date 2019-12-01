@@ -286,7 +286,8 @@ const countAwkwardness = async (ctx, bill, user) => {
     }
   }
 
-  awk = isSell ? avg - 170 : avg + 170
+  var axl = Math.floor((user.charge * 0.9) / 1000)
+  awk = !isSell ? avg + axl : avg - axl
 
   var t = setting.getTolerance()
 
@@ -453,7 +454,7 @@ const announceBill = async (ctx, bill, expire = true) => {
   var due
   switch (bill.due) {
     case 0:
-      due = 'امروزی'
+      due = ''
       break
     case 1:
       due = 'فردایی'
@@ -773,20 +774,20 @@ const billPrev = async bill => {
     .replace('x', buser.username)
     .replace('x', bill.amount)
     .replace('x', bill.price)
-    .replace(
-      'x',
-      (() => {
-        switch (bill.type) {
-          case 0:
-            return 'معمولی'
-          case -1:
-            return 'سر پایین'
-          case +1:
-            return 'سر بالا'
-        }
-      })()
-    )
     .replace('x', bill.code)
+    // .replace(
+    //   'x',
+    //   (() => {
+    //     switch (bill.type) {
+    //       case 0:
+    //         return 'معمولی'
+    //       case -1:
+    //         return 'سر پایین'
+    //       case +1:
+    //         return 'سر بالا'
+    //     }
+    //   })()
+    // )
   return m
 }
 
@@ -820,7 +821,9 @@ const onCharge = async userId => {
   avg /= oss
   var isSell = oss > 0
 
-  awk = isSell ? avg - 170 : avg + 170
+  
+  var axl = Math.floor((user.charge * 0.9) / 1000)
+  awk = isSell ? avg + axl : avg - axl
 
   var t = setting.getTolerance()
 
@@ -866,20 +869,26 @@ const checkAwk = async (ctx, user) => {
 
   if (bills.length == 0) return
 
+  var isSell =
+      user.awkwardness.isSell != undefined
+        ? user.awkwardness.isSell
+        : bills[0].isSell
+
+
   let shouldAwk = false
   var shouldalarm = false
   if (user.awkwardness.awk > 0) {
-    if (bills[0].isSell && user.awkwardness.awk <= v) {
+    if (isSell && user.awkwardness.awk >= v) {
       shouldAwk = true
-    } else if (!bills[0].isSell && user.awkwardness.awk >= v) {
+    } else if (!isSell && user.awkwardness.awk <= v) {
       shouldAwk = true
     }
 
     var min = v - 10
     var max = v + 10
-    if (bills[0].isSell && user.awkwardness.awk <= max) {
+    if (isSell && user.awkwardness.awk >= max) {
       shouldalarm = true
-    } else if (!bills[0].isSell && user.awkwardness.awk >= min) {
+    } else if (!isSell && user.awkwardness.awk <= min) {
       shouldalarm = true
     }
   }
@@ -887,26 +896,48 @@ const checkAwk = async (ctx, user) => {
   console.log(shouldAwk)
   console.log('**********')
   if (shouldAwk) {
-    let amount = 0
+
+    var amount = 0
+    var amount1 = 0
     await asyncForEach(bills, bill => {
-      amount += bill.left
+      if (bill.due == 0) amount += bill.left
+      else amount1 += bill.left
     })
 
-    if (amount == 0) return
-
-    let c = await ctx.setting.getCode()
     var price = Math.round(user.awkwardness.sellprice)
     console.log(user.awkwardness)
-    var abill = new Bill({
-      code: c,
-      userId: user.userId,
-      isSell: !bills[0].isSell,
-      amount: amount,
-      left: amount,
-      price
-    })
-    abill = await abill.save()
-    announceBill(ctx, abill, false)
+    var c
+    if(amount > 0) {
+      c = await ctx.setting.getCode()
+      var abill = new Bill({
+        code: c,
+        userId: user.userId,
+        isSell: !isSell,
+        amount: amount,
+        condition: 'حراج',
+        left: amount,
+        due : 0,
+        price
+      })
+      abill = await abill.save()
+      announceBill(ctx, abill, false)
+    }
+    if(amount1 > 0) {
+      c = await ctx.setting.getCode()
+      var a1bill = new Bill({
+        code: c,
+        userId: user.userId,
+        isSell: !isSell,
+        amount: amount,
+        condition: 'حراج',
+        left: amount,
+        due : 1,
+        price
+      })
+      a1bill = await a1bill.save()
+      announceBill(ctx, a1bill, false)
+    }
+
     ctx.telegram.sendMessage(user.userId, 'فاکتور شما حراج شد')
   } else if (shouldalarm) {
     ctx.telegram.sendMessage(
@@ -952,15 +983,15 @@ const doAwk = async (ctx, v) => {
         : bills[0].isSell
 
     if (user.awkwardness.awk > 0) {
-      if (isSell && user.awkwardness.awk <= v) {
+      if (isSell && user.awkwardness.awk >= v) {
         shouldAwk = true
-      } else if (!isSell && user.awkwardness.awk >= v) {
+      } else if (!isSell && user.awkwardness.awk <= v) {
         shouldAwk = true
       }
 
-      if (isSell && user.awkwardness.awk <= max) {
+      if (isSell && user.awkwardness.awk >= max) {
         shouldalarm = true
-      } else if (!isSell && user.awkwardness.awk >= min) {
+      } else if (!isSell && user.awkwardness.awk <= min) {
         shouldalarm = true
       }
     }
@@ -969,23 +1000,45 @@ const doAwk = async (ctx, v) => {
     console.log('**********')
     if (shouldAwk && !user.awkwardness.awked) {
       let amount = 0
+      let amount1 = 0
       await asyncForEach(bills, bill => {
-        amount += bill.left
+        if (bill.due == 0) amount += bill.left
+        else amount1 += bill.left
       })
-      let c = await ctx.setting.getCode()
+      var c
       var price = Math.round(user.awkwardness.sellprice)
       console.log(user.awkwardness)
-      var abill = new Bill({
-        code: c,
-        userId: user.userId,
-        isSell: !isSell,
-        amount: amount,
-        condition: 'حراج',
-        left: amount,
-        price
-      })
-      abill = await abill.save()
-      announceBill(ctx, abill, false)
+      if(amount > 0) {
+        c = await ctx.setting.getCode()
+        var abill = new Bill({
+          code: c,
+          userId: user.userId,
+          isSell: !isSell,
+          amount: amount,
+          condition: 'حراج',
+          left: amount,
+          due : 0,
+          price
+        })
+        abill = await abill.save()
+        announceBill(ctx, abill, false)
+      }
+      if(amount1 > 0) {
+        c = await ctx.setting.getCode()
+        var a1bill = new Bill({
+          code: c,
+          userId: user.userId,
+          isSell: !isSell,
+          amount: amount,
+          condition: 'حراج',
+          left: amount,
+          due : 1,
+          price
+        })
+        a1bill = await a1bill.save()
+        announceBill(ctx, a1bill, false)
+      }
+
       ctx.telegram.sendMessage(user.userId, 'فاکتور شما حراج شد')
 
       user.awkwardness.awked = true
