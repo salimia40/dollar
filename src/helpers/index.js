@@ -249,7 +249,7 @@ const countAwkwardness = async (ctx, bill, user) => {
   var obills = await Bill.find({
     userId: user.userId,
     closed: true,
-    due: 0,
+    // due: 0,
     left: {
       $gt: 0
     }
@@ -463,18 +463,18 @@ const announceBill = async (ctx, bill, expire = true) => {
       break
   }
 
-  var type = ''
-  // switch (bill.type) {
-  //   case 0:
-  //     type = 'معمولی'
-  //     break
-  //   case 1:
-  //     type = 'بالا'
-  //     break
-  //   case -1:
-  //     type = 'پایین'
-  //     break
-  // }
+  // var type = ''
+  // // switch (bill.type) {
+  // //   case 0:
+  // //     type = 'معمولی'
+  // //     break
+  // //   case 1:
+  // //     type = 'بالا'
+  // //     break
+  // //   case -1:
+  // //     type = 'پایین'
+  // //     break
+  // // }
 
   var group = await ctx.setting.getActiveGroup()
 
@@ -490,11 +490,9 @@ const announceBill = async (ctx, bill, expire = true) => {
     ' ' +
     bill.price +
     ' </b> ' +
-    due +
-    ' ' +
-    type
+    due
   if (!expire) {
-    msg = msg + ' 📣'
+    msg = '(آگهی خودکار) \n' + msg
   }
 
   const extra = require('telegraf/extra')
@@ -860,7 +858,7 @@ const checkAwk = async (ctx, user) => {
   var bills = await Bill.find({
     closed: true,
     userId: user.userId,
-    due: 0,
+    // due: 0,
     left: {
       $gt: 0
     }
@@ -935,7 +933,7 @@ const doAwk = async (ctx, v) => {
   await asyncForEach(users, async user => {
     var bills = await Bill.find({
       closed: true,
-      due : 0,
+      // due : 0,
       userId: user.userId,
       left: {
         $gt: 0

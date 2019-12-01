@@ -633,7 +633,7 @@ module.exports = {
     let c = await ctx.setting.getCode()
     bill = new Bill({
       code: c,
-      messageId: ctx.message.message_id,
+      // messageId: ctx.message.message_id,
       userId: ctx.user.userId,
       amount: amount,
       left: amount,
@@ -643,7 +643,7 @@ module.exports = {
       due
     })
     bill = await bill.save()
-    // helpers.announceBill(ctx, bill) 
+    helpers.announceBill(ctx, bill) 
     // }
   },
   offerByAmount: Telegraf.branch(
