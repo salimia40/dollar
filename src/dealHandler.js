@@ -106,13 +106,15 @@ handler.hears(
 
 handler.hears(
   /^ب$/,
-  ctx => {
+  (ctx,next) => {
     if (helpers.isReply(ctx)) next()
   },
   async ctx => {
     let bill = await Bill.findOne({
       messageId: ctx.message.reply_to_message.message_id
     })
+
+    console.log('offer by amount')
 
     if (bill == undefined || bill.closed || bill.expired) {
       // faker.forceDeal(ctx.message.reply_to_message.message_id)
