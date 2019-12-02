@@ -785,10 +785,10 @@ const billPrev = async bill => {
   ♻️ اتاق معاملاتی ارز انلاین`.trimRight()
 
   var m = sample
-    .replace(buser.username)
-    .replace(seller)
-    .replace(bill.amount)
-    .replace(toman(bill.price))
+    .replace(x, buser.username)
+    .replace(x,seller)
+    .replace(x,bill.amount)
+    .replace(x,toman(bill.price))
     .replace(
       'x',
       (() => {
@@ -819,8 +819,8 @@ const billPrev = async bill => {
         }
       })()
     )
-    .replace(dateToString(bill.date))
-    .replace(bill.code)
+    .replace(x,dateToString(bill.date))
+    .replace(x,bill.code)
 
   // var m = config.samples.billPrev
   //   .replace('x', seller)
