@@ -200,11 +200,11 @@ const postSettleImage = async (user, bills) => {
     }
 
     switch (due) {
-      case 0: 
-      deal += ' امروزی'
+      case 0:
+        deal += ' امروزی'
         break
-      case 1: 
-      deal += ' فردایی'
+      case 1:
+        deal += ' فردایی'
     }
 
     var oppId
@@ -784,11 +784,12 @@ const billPrev = async bill => {
   🔖 کد معامله: x
   ♻️ اتاق معاملاتی ارز انلاین`.trimRight()
 
+  var x = 'x'
   var m = sample
     .replace(x, buser.username)
-    .replace(x,seller)
-    .replace(x,bill.amount)
-    .replace(x,toman(bill.price))
+    .replace(x, seller)
+    .replace(x, bill.amount)
+    .replace(x, toman(bill.price))
     .replace(
       'x',
       (() => {
@@ -819,8 +820,8 @@ const billPrev = async bill => {
         }
       })()
     )
-    .replace(x,dateToString(bill.date))
-    .replace(x,bill.code)
+    .replace(x, dateToString(bill.date))
+    .replace(x, bill.code)
 
   // var m = config.samples.billPrev
   //   .replace('x', seller)
