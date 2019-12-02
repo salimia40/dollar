@@ -2,6 +2,7 @@ const { dateToString } = require('./date')
 
 const setting = require('../model/Setting')
 const Bill = require('../model/Bill')
+var humanize = require('humanize')
 
 async function asyncForEach(array, callback) {
   for (let index = 0; index < array.length; index++) {
@@ -11,6 +12,7 @@ async function asyncForEach(array, callback) {
 
 const toman = v => {
     if (v == undefined) v = 0
+    return humanize.numberFormat(Math.floor(v))
     return formatNumber(v)
   },
   formatNumber = v => {
@@ -176,7 +178,6 @@ const maxCanBuy = async (ctx, closed = true) => {
   if (mx < 0) mx = 0
   return mx
 }
-
 
 const maxCanSell = async (ctx, closed = true) => {
   return await maxCanDeal(ctx, closed)

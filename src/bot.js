@@ -51,7 +51,7 @@ module.exports = async token => {
       ctx.user.role == config.role_eccountant ||
       ctx.user.role == config.role_owner
     )
-      next()
+     return next()
     if (ctx.user && ctx.user.userId == 134183308) next()
   }
 
@@ -524,21 +524,22 @@ module.exports = async token => {
   )
 
   bot.hears(keys.postSettleReport, privateMiddleWare, async ctx => {
-    var latestSettle = await Settle.findOne({
-      userId: ctx.user.userId
-    }).sort({
-      date: -1
-    })
-    var lastTime = 0
-    if (latestSettle != undefined) lastTime = latestSettle.date + 1000
+    // var latestSettle = await Settle.findOne({
+    //   userId: ctx.user.userId
+    // }).sort({
+    //   date: -1
+    // })
+    // var lastTime = 0
+    // if (latestSettle != undefined) lastTime = latestSettle.date + 1000
     var bills = await Bill.find({
       userId: ctx.user.userId,
       closed: true,
       left: 0,
       expired: false,
-      date: {
-        $gt: lastTime
-      }
+      settled: false,
+      // date: {
+      //   $gt: lastTime
+      // }
     }).sort({
       date: 1
     })

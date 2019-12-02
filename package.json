@@ -18,6 +18,7 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
+    "humanize": "0.0.9",
     "jalali-moment": "^3.3.3",
     "moment": "^2.24.0",
     "mongoose": "^5.6.0",

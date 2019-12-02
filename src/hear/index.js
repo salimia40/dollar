@@ -69,15 +69,66 @@ module.exports = {
         $gt: 0
       }
     })
+
     if (opfs.length == 0) {
       ctx.reply('شما در حال حاظر فاکتور بازی ندارید')
     } else {
-      ctx.reply('درخواست با موفقیت ارسال شد لطفا منتظر بمانید')
+      var ts0 = []
+      var tf0 = []
+      var ts1 = []
+      var tf1 = []
 
-      let p = await helpers.opfImage(ctx, opfs)
-      ctx.replyWithPhoto({
-        source: p
-      })
+      while (opfs.length > 0) {
+        var bill = opfs.pop()
+        if (bill.isSell && bill.due == 0) {
+          ts0.push({ amount: bill.amount, price: bill.price })
+        } else if (bill.isSell && bill.due == 1) {
+          ts1.push({ amount: bill.amount, price: bill.price })
+        } else if (!bill.isSell && bill.due == 0) {
+          tf0.push({ amount: bill.amount, price: bill.price })
+        } else if (bill.isSell && bill.due == 1) {
+          tf1.push({ amount: bill.amount, price: bill.price })
+        }
+      }
+
+      const purify = input => {
+        var out = []
+        while (input.length > 0) {
+          var inv = input.pop()
+          var outed = false
+          out.forEach(o => {
+            if (o.price == inv.price && !outed) {
+              o.amount += inv.price
+              outed = true
+            }
+          })
+          if (!outed) out.push(inv)
+        }
+        return out
+      }
+
+      function stringify(input, str) {
+        return input.map(inv => {
+          return `شما تعداد ${inv.amount} فاکتور باز ${str} به مظنه ${helpers.toman(inv.price)} دارید`
+        })
+      }
+
+      var res = []
+      res.push(...stringify(purify(ts0), 'فروش امروزی'))
+      res.push(...stringify(purify(ts1), 'فروش فردایی'))
+      res.push(...stringify(purify(tf0), 'خرید امروزی'))
+      res.push(...stringify(purify(tf1), 'خرید فردایی'))
+
+      var message = res.join('\n')
+      console.log(message)
+      ctx.reply(message)
+
+      // ctx.reply('درخواست با موفقیت ارسال شد لطفا منتظر بمانید')
+
+      // let p = await helpers.opfImage(ctx, opfs)
+      // ctx.replyWithPhoto({
+      //   source: p
+      // })
     }
   },
   monthlyReport: async ctx => {
@@ -186,7 +237,7 @@ module.exports = {
         [keys.summitResipt, keys.reqCash],
         [keys.reqCard, keys.cardInfo],
         [keys.transactions, keys.help],
-        [keys.back, keys.support],
+        [keys.back, keys.support]
       ])
         .resize()
         .extra()
@@ -643,7 +694,7 @@ module.exports = {
       due
     })
     bill = await bill.save()
-    helpers.announceBill(ctx, bill) 
+    helpers.announceBill(ctx, bill)
     // }
   },
   offerByAmount: Telegraf.branch(

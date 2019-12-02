@@ -199,6 +199,14 @@ const postSettleImage = async (user, bills) => {
       deal = 'خرید'
     }
 
+    switch (due) {
+      case 0: 
+      deal += ' امروزی'
+        break
+      case 1: 
+      deal += ' فردایی'
+    }
+
     var oppId
     if (bill.isSell) {
       oppId = bill.buyerId
@@ -286,22 +294,21 @@ const countAwkwardness = async (ctx, bill, user) => {
     }
   }
 
-  var axl = Math.floor((user.charge * 0.9) / 1000)
-  awk = !isSell ? avg + axl : avg - axl
+  // margin
+  var t = 15
+  // var t = setting.getTolerance()
 
-  var t = setting.getTolerance()
+  var axl = Math.floor((user.charge * 0.9) / 1000)
+
+  awk = !isSell ? avg + axl : avg - axl
 
   var sellprice = isSell ? awk + t : awk - t
 
   var tempAwk = awk
   var tempPr = sellprice
-  if (isSell) {
-    sellprice = Math.floor(tempPr)
-    awk = Math.floor(tempAwk)
-  } else {
-    sellprice = Math.ceil(tempPr)
-    awk = Math.ceil(tempAwk)
-  }
+
+  sellprice = isSell ? Math.floor(tempPr) : Math.ceil(tempPr)
+  awk = isSell ? Math.floor(tempAwk) : Math.ceil(tempAwk)
 
   user.awkwardness = {
     awk,
@@ -769,25 +776,71 @@ const billPrev = async bill => {
     seller = suser.username
   }
 
-  var m = config.samples.billPrev
-    .replace('x', seller)
-    .replace('x', buser.username)
-    .replace('x', bill.amount)
-    .replace('x', bill.price)
-    .replace('x', bill.code)
-    // .replace(
-    //   'x',
-    //   (() => {
-    //     switch (bill.type) {
-    //       case 0:
-    //         return 'معمولی'
-    //       case -1:
-    //         return 'سر پایین'
-    //       case +1:
-    //         return 'سر بالا'
-    //     }
-    //   })()
-    // )
+  var sample = `🔵 خریدار : x
+  🔴 فروشنده : x
+  ✅ تعداد: x قیمت: x ✅
+  نوع معامله :x x
+  ⏱ ساعت: x
+  🔖 کد معامله: x
+  ♻️ اتاق معاملاتی ارز انلاین`.trimRight()
+
+  var m = sample
+    .replace(buser.username)
+    .replace(seller)
+    .replace(bill.amount)
+    .replace(toman(bill.price))
+    .replace(
+      'x',
+      (() => {
+        switch (bill.type) {
+          case 0:
+            return 'عادی'
+          case -1:
+            return 'سر پایین'
+          case +1:
+            return 'سر بالا'
+          default:
+            return ''
+        }
+      })()
+    )
+    .replace(
+      'x',
+      (() => {
+        switch (bill.due) {
+          case 0:
+            return 'امروزی'
+          case 1:
+            return 'فردایی'
+          case 2:
+            return 'پسفردایی'
+          default:
+            return ''
+        }
+      })()
+    )
+    .replace(dateToString(bill.date))
+    .replace(bill.code)
+
+  // var m = config.samples.billPrev
+  //   .replace('x', seller)
+  //   .replace('x', buser.username)
+  //   .replace('x', bill.amount)
+  //   .replace('x', toman(bill.price))
+  //   .replace('x', bill.code)
+  // .replace(
+  //   'x',
+  //   (() => {
+  //     switch (bill.type) {
+  //       case 0:
+  //         return 'عادی'
+  //       case -1:
+  //         return 'سر پایین'
+  //       case +1:
+  //         return 'سر بالا'
+  //     }
+  //   })()
+  // )
   return m
 }
 
@@ -821,24 +874,20 @@ const onCharge = async userId => {
   avg /= oss
   var isSell = oss > 0
 
-  
   var axl = Math.floor((user.charge * 0.9) / 1000)
   awk = isSell ? avg + axl : avg - axl
 
-  var t = setting.getTolerance()
+  // var t = setting.getTolerance()
+  var t = 15
 
   var sellprice = isSell ? awk + t : awk - t
 
   //// replace vals
   var tempAwk = sellprice
   var tempPr = awk
-  if (isSell) {
-    sellprice = Math.floor(tempPr)
-    awk = Math.floor(tempAwk)
-  } else {
-    sellprice = Math.ceil(tempPr)
-    awk = Math.ceil(tempAwk)
-  }
+
+  sellprice = isSell ? Math.floor(tempPr) : Math.ceil(tempPr)
+  awk = isSell ? Math.floor(tempAwk) : Math.ceil(tempAwk)
 
   user.awkwardness = {
     awk,
@@ -870,10 +919,9 @@ const checkAwk = async (ctx, user) => {
   if (bills.length == 0) return
 
   var isSell =
-      user.awkwardness.isSell != undefined
-        ? user.awkwardness.isSell
-        : bills[0].isSell
-
+    user.awkwardness.isSell != undefined
+      ? user.awkwardness.isSell
+      : bills[0].isSell
 
   let shouldAwk = false
   var shouldalarm = false
@@ -896,7 +944,6 @@ const checkAwk = async (ctx, user) => {
   console.log(shouldAwk)
   console.log('**********')
   if (shouldAwk) {
-
     var amount = 0
     var amount1 = 0
     await asyncForEach(bills, bill => {
@@ -907,7 +954,7 @@ const checkAwk = async (ctx, user) => {
     var price = Math.round(user.awkwardness.sellprice)
     console.log(user.awkwardness)
     var c
-    if(amount > 0) {
+    if (amount > 0) {
       c = await ctx.setting.getCode()
       var abill = new Bill({
         code: c,
@@ -916,13 +963,13 @@ const checkAwk = async (ctx, user) => {
         amount: amount,
         condition: 'حراج',
         left: amount,
-        due : 0,
+        due: 0,
         price
       })
       abill = await abill.save()
       announceBill(ctx, abill, false)
     }
-    if(amount1 > 0) {
+    if (amount1 > 0) {
       c = await ctx.setting.getCode()
       var a1bill = new Bill({
         code: c,
@@ -931,7 +978,7 @@ const checkAwk = async (ctx, user) => {
         amount: amount,
         condition: 'حراج',
         left: amount,
-        due : 1,
+        due: 1,
         price
       })
       a1bill = await a1bill.save()
@@ -1008,7 +1055,7 @@ const doAwk = async (ctx, v) => {
       var c
       var price = Math.round(user.awkwardness.sellprice)
       console.log(user.awkwardness)
-      if(amount > 0) {
+      if (amount > 0) {
         c = await ctx.setting.getCode()
         var abill = new Bill({
           code: c,
@@ -1017,13 +1064,13 @@ const doAwk = async (ctx, v) => {
           amount: amount,
           condition: 'حراج',
           left: amount,
-          due : 0,
+          due: 0,
           price
         })
         abill = await abill.save()
         announceBill(ctx, abill, false)
       }
-      if(amount1 > 0) {
+      if (amount1 > 0) {
         c = await ctx.setting.getCode()
         var a1bill = new Bill({
           code: c,
@@ -1032,7 +1079,7 @@ const doAwk = async (ctx, v) => {
           amount: amount,
           condition: 'حراج',
           left: amount,
-          due : 1,
+          due: 1,
           price
         })
         a1bill = await a1bill.save()
