@@ -293,7 +293,7 @@ const countAwkwardness = async (ctx, bill, user) => {
   } else {
     var isSell0 = od0 > 0
     avg0 /= od0
-    awk = !isSell ? avg0 + axl : avg0 - axl
+    awk = !isSell0 ? avg0 + axl : avg0 - axl
     sellprice = isSell0 ? awk + t : awk - t
     sellprice = isSell0 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell0 ? Math.floor(awk) : Math.ceil(awk)
@@ -315,7 +315,7 @@ const countAwkwardness = async (ctx, bill, user) => {
   } else {
     var isSell1 = od1 > 0
     avg1 /= od1
-    awk = !isSell ? avg1 + axl : avg1 - axl
+    awk = !isSell1 ? avg1 + axl : avg1 - axl
     sellprice = isSell1 ? awk + t : awk - t
     sellprice = isSell1 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell1 ? Math.floor(awk) : Math.ceil(awk)
@@ -938,6 +938,8 @@ const onCharge = async userId => {
 
 const checkAwkWithDue = async (ctx, user, due) => {
   var q = setting.getQuotation()
+
+  var v = q
 
   if (!isFinite(user.awkwardness[`d${due}`].awk)) return
   if (q == undefined) return

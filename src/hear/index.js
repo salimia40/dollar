@@ -81,13 +81,13 @@ module.exports = {
       while (opfs.length > 0) {
         var bill = opfs.pop()
         if (bill.isSell && bill.due == 0) {
-          ts0.push({ amount: bill.amount, price: bill.price })
+          ts0.push({ amount: bill.left, price: bill.price })
         } else if (bill.isSell && bill.due == 1) {
-          ts1.push({ amount: bill.amount, price: bill.price })
+          ts1.push({ amount: bill.left, price: bill.price })
         } else if (!bill.isSell && bill.due == 0) {
-          tf0.push({ amount: bill.amount, price: bill.price })
+          tf0.push({ amount: bill.left, price: bill.price })
         } else if (bill.isSell && bill.due == 1) {
-          tf1.push({ amount: bill.amount, price: bill.price })
+          tf1.push({ amount: bill.left, price: bill.price })
         }
       }
 
@@ -95,14 +95,14 @@ module.exports = {
         var out = []
         while (input.length > 0) {
           var inv = input.pop()
-          var outed = false
           out.forEach(o => {
+            var outed = false
             if (o.price == inv.price && !outed) {
-              o.amount += inv.price
+              o.amount += inv.amount
               outed = true
             }
+            if (!outed) out.push(inv)
           })
-          if (!outed) out.push(inv)
         }
         return out
       }

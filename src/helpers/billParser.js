@@ -199,9 +199,9 @@ const billToSring = async (bill, result, user) => {
   while (bills.length > 0) {
     var b = bills.pop()
     if (b.due == 0) {
-      if (b.isSell) tot1 += b.left
-      else tot1 -= b.left
-      avg1 += (b.isSell ? b.left : 0 - b.left) * b.price
+      if (b.isSell) tot0 += b.left
+      else tot0 -= b.left
+      avg0 += (b.isSell ? b.left : 0 - b.left) * b.price
     } else {
       if (b.isSell) tot1 += b.left
       else tot1 -= b.left
