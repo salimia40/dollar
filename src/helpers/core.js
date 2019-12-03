@@ -12,8 +12,8 @@ async function asyncForEach(array, callback) {
 
 const toman = v => {
     if (v == undefined) v = 0
-    return humanize.numberFormat(Math.floor(v))
-    return formatNumber(v)
+    return humanize.numberFormat(Math.floor(v),0)
+    // return formatNumber(v)
   },
   formatNumber = v => {
     return v.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')

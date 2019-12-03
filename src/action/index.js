@@ -24,7 +24,7 @@ module.exports = {
         break
     }
     await user.save()
-    helpers.onCharge(user.userId)
+    await helpers.onCharge(user.userId)
 
     var ischarge = state.action == 'charge'
     var explain = ischarge ? 'شارژ دستی توسط ادمین' : 'برداشت دستی توسط ادمین'

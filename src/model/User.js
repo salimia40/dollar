@@ -53,15 +53,29 @@ const userSchema = new Schema({
   state: String,
   name: String,
   awkwardness: {
-    awk: Number,
-    sellprice: Number,
-    awked: {
-      type: Boolean,
-      default: false
+    d0: {
+      awk: Number,
+      sellprice: Number,
+      awked: {
+        type: Boolean,
+        default: false
+      },
+      isSell: {
+        type: Boolean,
+        default: false
+      }
     },
-    isSell: {
-      type: Boolean,
-      default: false
+    d1: {
+      awk: Number,
+      sellprice: Number,
+      awked: {
+        type: Boolean,
+        default: false
+      },
+      isSell: {
+        type: Boolean,
+        default: false
+      }
     }
   },
   bank: {
