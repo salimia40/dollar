@@ -287,7 +287,7 @@ const countAwkwardness = async (ctx, bill, user) => {
     user.awkwardness.d0 = {
       awk: 0,
       sellprice: 0,
-      awked: false,
+      awked: false
       // isSell0
     }
   } else {
@@ -309,13 +309,13 @@ const countAwkwardness = async (ctx, bill, user) => {
     user.awkwardness.d1 = {
       awk: 0,
       sellprice: 0,
-      awked: false,
+      awked: false
       // isSell: isSell1
     }
   } else {
     var isSell1 = od1 > 0
     avg1 /= od1
-    awk = !isSell1 ? avg1 + axl : avg1 - axl
+    awk = isSell1 ? avg1 + axl : avg1 - axl
     sellprice = isSell1 ? awk + t : awk - t
     sellprice = isSell1 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell1 ? Math.floor(awk) : Math.ceil(awk)
@@ -576,11 +576,13 @@ const reAnnounceBill = async (ctx, bill) => {
     '( مانده ' +
     bill.amount +
     ')'
-  if (!expire) {
+  if (bill.condition != 'عادی') {
     msg = '(آگهی خودکار) \n' + msg
   }
 
-  ctx.telegram.editMessageText(group, mid, msg)
+  console.log(msg)
+
+  assistant.editMessageText(group, mid, null, msg)
 }
 
 const makeDeal = async ctx => {
@@ -948,13 +950,13 @@ const onCharge = async userId => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell : false
+      isSell: false
     }
   } else {
     var isSell0 = od0 > 0
     avg0 /= od0
-    awk = isSell ? avg0 + axl : avg0 - axl
-    sellprice = isSell0 ? awk + t : awk - t
+    awk = isSell0 ? avg0 + axl : avg0 - axl
+    sellprice = ~!isSell0 ? awk + t : awk - t
     sellprice = isSell0 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell0 ? Math.floor(awk) : Math.ceil(awk)
     user.awkwardness.d0 = {
@@ -970,13 +972,13 @@ const onCharge = async userId => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell : false
+      isSell: false
     }
   } else {
     var isSell1 = od1 > 0
     avg1 /= od1
-    awk = !isSell ? avg1 + axl : avg1 - axl
-    sellprice = isSell1 ? awk + t : awk - t
+    awk = isSell1 ? avg1 + axl : avg1 - axl
+    sellprice = !isSell1 ? awk + t : awk - t
     sellprice = isSell1 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell1 ? Math.floor(awk) : Math.ceil(awk)
     user.awkwardness.d1 = {
@@ -1019,17 +1021,17 @@ const checkAwkWithDue = async (ctx, user, due) => {
   var shouldAwk = false
   var shouldalarm = false
   if (user.awkwardness[`d${due}`].awk > 0) {
-    if (isSell && user.awkwardness[`d${due}`].awk >= v) {
+    if (!isSell && user.awkwardness[`d${due}`].awk >= v) {
       shouldAwk = true
-    } else if (!isSell && user.awkwardness[`d${due}`].awk <= v) {
+    } else if (isSell && user.awkwardness[`d${due}`].awk <= v) {
       shouldAwk = true
     }
 
     var min = v - 10
     var max = v + 10
-    if (isSell && user.awkwardness[`d${due}`].awk >= max) {
+    if (!isSell && user.awkwardness[`d${due}`].awk >= max) {
       shouldalarm = true
-    } else if (!isSell && user.awkwardness[`d${due}`].awk <= min) {
+    } else if (isSell && user.awkwardness[`d${due}`].awk <= min) {
       shouldalarm = true
     }
   }

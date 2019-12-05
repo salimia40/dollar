@@ -12,7 +12,7 @@ async function asyncForEach(array, callback) {
 
 const toman = v => {
     if (v == undefined) v = 0
-    return humanize.numberFormat(Math.floor(v),0)
+    return humanize.numberFormat(Math.floor(v), 0)
     // return formatNumber(v)
   },
   formatNumber = v => {
@@ -123,7 +123,11 @@ const maxCanDeal = async (ctx, closed = true) => {
     ctx.user.config.baseCharge == -1
       ? ctx.setting.getBaseCharge()
       : ctx.user.config.baseCharge
+
+  console.log('max can deal')
+  console.log(bc)
   let mx = Math.floor(ctx.user.charge / bc)
+  console.log(mx)
   var query = {
     expired: false,
     settled: false,
@@ -132,80 +136,43 @@ const maxCanDeal = async (ctx, closed = true) => {
       $gt: 0
     }
   }
+  console.log(closed)
   if (closed) query.closed = true
   let bills = await Bill.find({ ...query })
   let am = 0
 
-  var index = 0
-  while (index < bills.length) {
-    var bill = bills[index++]
-    am += bill.left
+  while (bills.length > 0) {
+    var bill = bills.pop()
+    if( bill.isSell) {
+      am += bill.left
+    } else {
+      am -= bill.left
+    }
   }
 
-  mx -= am
+  console.log(am)
+
+  return {am,mx}
+
+  mx -= Math.abs(am)
+
   if (mx < 0) mx = 0
   return mx
 }
 
 const maxCanBuy = async (ctx, closed = true) => {
-  return await maxCanDeal(ctx, closed)
-  let bc =
-    ctx.user.config.baseCharge == -1
-      ? ctx.setting.getBaseCharge()
-      : ctx.user.config.baseCharge
-  let mx = Math.floor(ctx.user.charge / bc)
-  var query = {
-    settled: false,
-    expired: false,
-    userId: ctx.user.userId,
-    isSell: false,
-    left: {
-      $gt: 0
-    }
-  }
-  if (closed) query.closed = closed
-  let bills = await Bill.find({ ...query })
-  let am = 0
-
-  var index = 0
-  while (index < bills.length) {
-    var bill = bills[index++]
-    am += bill.left
-  }
-
+  var {am,mx} = await maxCanDeal(ctx, closed)
   mx -= am
-
+  
   if (mx < 0) mx = 0
   return mx
+  
 }
 
 const maxCanSell = async (ctx, closed = true) => {
-  return await maxCanDeal(ctx, closed)
-  let bc =
-    ctx.user.config.baseCharge == -1
-      ? ctx.setting.getBaseCharge()
-      : ctx.user.config.baseCharge
-  let mx = Math.floor(ctx.user.charge / bc)
-  var query = {
-    expired: false,
-    settled: false,
-    userId: ctx.user.userId,
-    isSell: true,
-    left: {
-      $gt: 0
-    }
-  }
-  if (closed) query.closed = true
-  let bills = await Bill.find({ ...query })
-  let am = 0
-
-  var index = 0
-  while (index < bills.length) {
-    var bill = bills[index++]
-    am += bill.left
-  }
-
+  var {am,mx} = await maxCanDeal(ctx, closed)
   mx -= am
+  
   if (mx < 0) mx = 0
   return mx
 }

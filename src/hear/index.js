@@ -91,25 +91,34 @@ module.exports = {
         }
       }
 
+      console.log(opfs)
+
+      console.log(ts0)
+      console.log(ts1)
+      console.log(tf0)
+      console.log(tf1)
+
       const purify = input => {
         var out = []
         while (input.length > 0) {
           var inv = input.pop()
+          var outed = false
           out.forEach(o => {
-            var outed = false
-            if (o.price == inv.price && !outed) {
+            if (o.price == inv.price) {
               o.amount += inv.amount
               outed = true
             }
-            if (!outed) out.push(inv)
           })
+          if (!outed) out.push(inv)
         }
         return out
       }
 
       function stringify(input, str) {
         return input.map(inv => {
-          return `شما تعداد ${inv.amount} فاکتور باز ${str} به مظنه ${helpers.toman(inv.price)} دارید`
+          return `شما تعداد ${
+            inv.amount
+          } فاکتور باز ${str} به مظنه ${helpers.toman(inv.price)} دارید`
         })
       }
 
@@ -120,7 +129,6 @@ module.exports = {
       res.push(...stringify(purify(tf1), 'خرید فردایی'))
 
       var message = res.join('\n')
-      console.log(message)
       ctx.reply(message)
 
       // ctx.reply('درخواست با موفقیت ارسال شد لطفا منتظر بمانید')
@@ -565,20 +573,19 @@ module.exports = {
       /**
        * next block can be used in case wanting it cancel all offers in once
        */
-      // }
-      // else if (helpers.isGroup(ctx)) {
-      //     var bills = await Bill.find({
-      //         userId: ctx.user.userId,
-      //         expired: false,
-      //         closed: false,
-      //     })
-      //     for (let index = 0; index < bills.length; index++) {
-      //         const bill = bills[index]
-      //         if (bill == undefined) continue
-      //         bill.expired = true
-      //         await bill.save()
-      //     }
-      //     ctx.telegram.sendMessage(ctx.user.userId, 'همه لفظ های شما باطل شد')
+    } else if (helpers.isGroup(ctx)) {
+      var bills = await Bill.find({
+        userId: ctx.user.userId,
+        expired: false,
+        closed: false
+      })
+      for (let index = 0; index < bills.length; index++) {
+        const bill = bills[index]
+        if (bill == undefined) continue
+        bill.expired = true
+        await bill.save()
+      }
+      ctx.telegram.sendMessage(ctx.user.userId, 'همه لفظ های شما باطل شد')
     } else return next()
   },
   validateOffer: async (ctx, next) => {

@@ -600,7 +600,7 @@ module.exports = async token => {
     ownerMiddleWare,
     async ctx => {
       var quotation = ctx.setting.getQuotation()
-      helpers.setQuotation(ctx, ++quotation)
+      helpers.setQuotation(ctx, quotation + 10 )
     }
   )
 
@@ -610,7 +610,7 @@ module.exports = async token => {
     ownerMiddleWare,
     async ctx => {
       var quotation = ctx.setting.getQuotation()
-      helpers.setQuotation(ctx, --quotation)
+      helpers.setQuotation(ctx, quotation - 10)
     }
   )
 

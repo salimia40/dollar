@@ -235,7 +235,7 @@ const billToSring = async (bill, result, user) => {
   var awkpart1 = ''
 
   if (tot0 != 0) {
-    isSell = tot > 0
+    isSell = tot0 > 0
     tot0 = Math.abs(tot0)
     awkpart0 = awkMsg
       .replace('x', tot0)
@@ -248,7 +248,7 @@ const billToSring = async (bill, result, user) => {
   }
 
   if (tot1 != 0) {
-    isSell = tot > 0
+    isSell = tot1 > 0
     tot1 = Math.abs(tot1)
     awkpart1 = awkMsg
       .replace('x', tot1)
