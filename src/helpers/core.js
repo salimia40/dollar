@@ -153,7 +153,7 @@ const maxCanDeal = async (ctx, closed = true) => {
   console.log(am)
 
   return {am,mx}
-
+ 
   mx -= Math.abs(am)
 
   if (mx < 0) mx = 0

@@ -582,7 +582,11 @@ const reAnnounceBill = async (ctx, bill) => {
 
   console.log(msg)
 
-  assistant.editMessageText(group, mid, null, msg)
+  const extra = require('telegraf/extra')
+  // const markup = extra.markdown()
+  const markup = extra.HTML()
+
+  assistant.editMessageText(group, mid, null, msg, markup)
 }
 
 const makeDeal = async ctx => {
@@ -1020,6 +1024,8 @@ const checkAwkWithDue = async (ctx, user, due) => {
 
   var shouldAwk = false
   var shouldalarm = false
+  console.log(user.username)
+  console.log(user.awkwardness)
   if (user.awkwardness[`d${due}`].awk > 0) {
     if (!isSell && user.awkwardness[`d${due}`].awk >= v) {
       shouldAwk = true

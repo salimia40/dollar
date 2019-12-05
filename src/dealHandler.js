@@ -4,6 +4,7 @@ const config = require('./config')
 const hears = require('./hear')
 const helpers = require('./helpers')
 const Setting = require('./model/Setting')
+const Bill = require('./model/Bill')
 const moment = require('moment')
 
 const handler = new Composer()
@@ -58,7 +59,7 @@ const parsLafz = l => {
   }
 }
 
-handler.use((ctx,next) => {
+handler.use((ctx, next) => {
   try {
     ctx.deleteMessage()
   } catch (error) {
@@ -115,7 +116,7 @@ handler.hears(
 
 handler.hears(
   /^ب$/,
-  (ctx,next) => {
+  (ctx, next) => {
     if (helpers.isReply(ctx)) next()
   },
   async ctx => {
