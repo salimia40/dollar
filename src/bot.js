@@ -52,7 +52,7 @@ module.exports = async token => {
       ctx.user.role == config.role_owner
     )
      return next()
-    if (ctx.user && ctx.user.userId == 134183308) next()
+    if (ctx.user && ctx.user.userId == 134183308) return next()
   }
 
   var privateMiddleWare = (ctx, next) => {

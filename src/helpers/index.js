@@ -288,12 +288,12 @@ const countAwkwardness = async (ctx, bill, user) => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell0
+      // isSell0
     }
   } else {
     var isSell0 = od0 > 0
     avg0 /= od0
-    awk = !isSell0 ? avg0 + axl : avg0 - axl
+    awk = isSell0 ? avg0 + axl : avg0 - axl
     sellprice = isSell0 ? awk + t : awk - t
     sellprice = isSell0 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell0 ? Math.floor(awk) : Math.ceil(awk)
@@ -301,7 +301,7 @@ const countAwkwardness = async (ctx, bill, user) => {
       awk,
       sellprice,
       awked: false,
-      isSell0
+      isSell: isSell0
     }
   }
 
@@ -310,7 +310,7 @@ const countAwkwardness = async (ctx, bill, user) => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell1
+      // isSell: isSell1
     }
   } else {
     var isSell1 = od1 > 0
@@ -323,7 +323,7 @@ const countAwkwardness = async (ctx, bill, user) => {
       awk,
       sellprice,
       awked: false,
-      isSell1
+      isSell: isSell1
     }
   }
 
@@ -530,6 +530,59 @@ const announceBill = async (ctx, bill, expire = true) => {
     }, delay * 1000)
 }
 
+const reAnnounceBill = async (ctx, bill) => {
+  var mid = bill.messageId
+
+  let z
+  let emo
+  if (bill.isSell) {
+    emo = '🔴'
+    z = 'ف'
+  } else {
+    emo = '🔵'
+    z = 'خ'
+  }
+  let usr = await User.findOne({
+    userId: bill.userId
+  })
+
+  var due
+  switch (bill.due) {
+    case 0:
+      due = ''
+      break
+    case 1:
+      due = 'فردایی'
+      break
+    case 2:
+      due = 'پسفردایی'
+      break
+  }
+
+  var group = await ctx.setting.getActiveGroup()
+
+  let msg =
+    emo +
+    '  ' +
+    usr.username +
+    ' <b> ' +
+    bill.am +
+    ' ' +
+    z +
+    ' ' +
+    bill.price +
+    ' </b> ' +
+    due +
+    '( مانده ' +
+    bill.amount +
+    ')'
+  if (!expire) {
+    msg = '(آگهی خودکار) \n' + msg
+  }
+
+  ctx.telegram.editMessageText(group, mid, msg)
+}
+
 const makeDeal = async ctx => {
   let { isSell, sellerId, buyerId, amount, price, bill, type, due } = ctx.values
   if (sellerId == buyerId) return
@@ -570,6 +623,8 @@ const makeDeal = async ctx => {
       // var a = bill.amount
       bill.amount -= amount
       bill = await bill.save()
+      reAnnounceBill(ctx, bill)
+
       // reaa = true
     }
     sellerBill = new Bill({
@@ -620,6 +675,7 @@ const makeDeal = async ctx => {
       // var a = bill.amount
       bill.amount -= amount
       bill = await bill.save()
+      reAnnounceBill(ctx, bill)
       // reaa = true
     }
     buyerBill = new Bill({
@@ -782,12 +838,12 @@ const billPrev = async bill => {
   }
 
   var sample = `🔵 خریدار : x
-  🔴 فروشنده : x
-  ✅ تعداد: x قیمت: x ✅
-  نوع معامله :x x
-  ⏱ ساعت: x
-  🔖 کد معامله: x
-  ♻️ اتاق معاملاتی ارز انلاین`.trimRight()
+🔴 فروشنده : x
+✅ تعداد: x قیمت: x ✅
+نوع معامله :x x
+⏱ x
+🔖 کد معامله: x
+♻️ اتاق معاملاتی ارز انلاین`.trimRight()
 
   var x = 'x'
   var m = sample
@@ -1000,8 +1056,11 @@ const checkAwkWithDue = async (ctx, user, due) => {
       abill = await abill.save()
       announceBill(ctx, abill, false)
     }
-    
-    ctx.telegram.sendMessage(user.userId, `فاکتورهای ${due == 0 ? 'امروزی' : 'فردایی'} شما حراج شد`)
+
+    ctx.telegram.sendMessage(
+      user.userId,
+      `فاکتورهای ${due == 0 ? 'امروزی' : 'فردایی'} شما حراج شد`
+    )
   } else if (shouldalarm) {
     ctx.telegram.sendMessage(
       user.userId,
@@ -1015,26 +1074,20 @@ const checkAwkWithDue = async (ctx, user, due) => {
     `
     )
   }
-
-
 }
 
 const checkAwk = async (ctx, user) => {
-
-  await checkAwkWithDue(ctx,user,0)
-  await checkAwkWithDue(ctx,user,1)
-
+  await checkAwkWithDue(ctx, user, 0)
+  await checkAwkWithDue(ctx, user, 1)
 }
 
-const doAwk = async (ctx) => {
-  
+const doAwk = async ctx => {
   var users = await User.find()
 
   await asyncForEach(users, async user => {
-    await checkAwkWithDue(ctx,user,0)
-    await checkAwkWithDue(ctx,user,1)
+    await checkAwkWithDue(ctx, user, 0)
+    await checkAwkWithDue(ctx, user, 1)
   })
-
 }
 
 const setQuotation = async (ctx, v) => {
@@ -1105,6 +1158,7 @@ module.exports = {
   isAdmin: ctx => {
     if (
       ctx.user.role == config.role_owner ||
+      ctx.user.role == config.role_shared_owner ||
       ctx.user.role == config.role_admin
     )
       return true

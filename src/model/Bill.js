@@ -69,6 +69,9 @@ const billSchema = new Schema({
         type: Number,
         required: true
     },
+    am: {
+        type: Number
+    },
     sells: [{
         price: Number,
         amount: Number,

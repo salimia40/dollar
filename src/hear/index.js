@@ -687,6 +687,7 @@ module.exports = {
       // messageId: ctx.message.message_id,
       userId: ctx.user.userId,
       amount: amount,
+      am: amount,
       left: amount,
       price: price,
       isSell: isSell,

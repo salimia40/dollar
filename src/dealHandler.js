@@ -58,6 +58,15 @@ const parsLafz = l => {
   }
 }
 
+handler.use((ctx,next) => {
+  try {
+    ctx.deleteMessage()
+  } catch (error) {
+    //
+  }
+  next()
+})
+
 handler.hears(
   /\d+\s*(ف|خ)\s*\d+/,
   // async (ctx, next) => {
