@@ -948,12 +948,12 @@ const onCharge = async userId => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell0
+      isSell : false
     }
   } else {
     var isSell0 = od0 > 0
     avg0 /= od0
-    awk = !isSell ? avg0 + axl : avg0 - axl
+    awk = isSell ? avg0 + axl : avg0 - axl
     sellprice = isSell0 ? awk + t : awk - t
     sellprice = isSell0 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell0 ? Math.floor(awk) : Math.ceil(awk)
@@ -961,7 +961,7 @@ const onCharge = async userId => {
       awk,
       sellprice,
       awked: false,
-      isSell0
+      isSell: isSell0
     }
   }
 
@@ -970,7 +970,7 @@ const onCharge = async userId => {
       awk: 0,
       sellprice: 0,
       awked: false,
-      isSell1
+      isSell : false
     }
   } else {
     var isSell1 = od1 > 0
@@ -983,7 +983,7 @@ const onCharge = async userId => {
       awk,
       sellprice,
       awked: false,
-      isSell1
+      isSell: isSell1
     }
   }
 
