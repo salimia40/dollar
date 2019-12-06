@@ -131,6 +131,14 @@ module.exports = {
       userId: c
     })
 
+    if(user.confirmed) {
+      ctx.answerCbQuery('قبلا با ثبت نام کاربر موافقت شده')
+      return
+    }
+    else {
+      ctx.answerCbQuery('با ثبت نام کاربر موافقت شد')
+    }
+
     let btns = [
       [keys.openfacts, keys.monthlyReport],
       [keys.postSettleReport, keys.semiSettle],

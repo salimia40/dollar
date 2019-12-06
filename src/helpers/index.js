@@ -261,6 +261,9 @@ const countAwkwardness = async (ctx, bill, user) => {
     }
   })
 
+
+  var totalOPF = 0
+
   var od0 = 0
   var od1 = 0
   var avg0 = 0
@@ -276,11 +279,12 @@ const countAwkwardness = async (ctx, bill, user) => {
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
     }
+    totalOPF += bill.left 
   })
 
   // margin
   var t = 15
-  var axl = Math.floor((user.charge * 0.9) / 1000)
+  var axl = Math.floor(((user.charge / totalOPF) * 0.9) / 1000)
   var awk, sellprice
 
   if (od0 == 0) {
@@ -522,15 +526,17 @@ const announceBill = async (ctx, bill, expire = true) => {
       if (bill == undefined) {
         console.log('hmmmm')
       } else if (!bill.closed && !bill.expired) {
-        Bill.findByIdAndDelete(bill._id).exec()
+        // Bill.findByIdAndDelete(bill._id).exec()
+        bill.expired = true
+        await bill.save()
       }
       if (bill != undefined && bill.expired) {
-        Bill.findByIdAndDelete(bill._id).exec()
+        // Bill.findByIdAndDelete(bill._id).exec()
       }
     }, delay * 1000)
 }
 
-const reAnnounceBill = async (ctx, bill) => {
+const reAnnounceBill = async (ctx, bill, text) => {
   var mid = bill.messageId
 
   let z
@@ -580,13 +586,21 @@ const reAnnounceBill = async (ctx, bill) => {
     msg = '(آگهی خودکار) \n' + msg
   }
 
-  console.log(msg)
+  if (text != undefined) {
+    msg += `  (${text})`
+  }
 
   const extra = require('telegraf/extra')
-  // const markup = extra.markdown()
   const markup = extra.HTML()
 
-  assistant.editMessageText(group, mid, null, msg, markup)
+  var res = await assistant.editMessageText(group, mid, null, msg, markup)
+
+  bill.messageId = res.message_id
+  await bill.save()
+
+  console.log('res =')
+  console.log(res)
+
 }
 
 const makeDeal = async ctx => {
@@ -596,43 +610,22 @@ const makeDeal = async ctx => {
   cb = await ctx.setting.getCode()
 
   if (isSell) {
-    if (bill.amount == amount) {
-      buyerBill = Object.assign(bill, {
-        code: cb,
-        closed: true,
-        isSell: false,
-        date: Date.now(),
-        left: amount,
-        sellerId,
-        buyerId,
-        // type,
-        due
-      })
-    } else {
-      buyerBill = new Bill({
-        code: cb,
-        isSell: false,
-        closed: true,
-        userId: buyerId,
+    buyerBill = new Bill({
+      code: cb,
+      isSell: false,
+      closed: true,
+      userId: buyerId,
 
-        date: Date.now(),
-        left: amount,
-        sellerId,
-        buyerId,
-        amount: amount,
-        price: price,
-        // type,
-        due
-      })
+      date: Date.now(),
+      left: amount,
+      sellerId,
+      buyerId,
+      amount: amount,
+      price: price,
+      // type,
+      due
+    })
 
-      /**update bill */
-      // var a = bill.amount
-      bill.amount -= amount
-      bill = await bill.save()
-      reAnnounceBill(ctx, bill)
-
-      // reaa = true
-    }
     sellerBill = new Bill({
       code: cb,
       isSell: true,
@@ -648,42 +641,22 @@ const makeDeal = async ctx => {
       due
     })
   } else {
-    if (bill.amount == amount) {
-      sellerBill = Object.assign(bill, {
-        code: cb,
-        closed: true,
-        isSell: true,
-        date: Date.now(),
+    sellerBill = new Bill({
+      code: cb,
+      isSell: true,
+      closed: true,
+      userId: sellerId,
+      date: Date.now(),
 
-        left: amount,
-        sellerId,
-        buyerId,
-        // type,
-        due
-      })
-    } else {
-      sellerBill = new Bill({
-        code: cb,
-        isSell: true,
-        closed: true,
-        userId: sellerId,
-        date: Date.now(),
+      left: amount,
+      sellerId,
+      buyerId,
+      amount: amount,
+      price: price,
+      // type,
+      due
+    })
 
-        left: amount,
-        sellerId,
-        buyerId,
-        amount: amount,
-        price: price,
-        // type,
-        due
-      })
-      /**update bill */
-      // var a = bill.amount
-      bill.amount -= amount
-      bill = await bill.save()
-      reAnnounceBill(ctx, bill)
-      // reaa = true
-    }
     buyerBill = new Bill({
       code: cb,
       isSell: false,
@@ -700,6 +673,11 @@ const makeDeal = async ctx => {
     })
   }
 
+  /**update bill */
+  bill.amount -= amount
+  bill = await bill.save()
+  await reAnnounceBill(ctx, bill)
+
   let selRes = await closeDeals(ctx, sellerBill, price)
   let buyRes = await closeDeals(ctx, buyerBill, price)
 
@@ -711,14 +689,6 @@ const makeDeal = async ctx => {
   buyerBill = await buyerBill.save()
   var suser = await countAwkwardness(ctx, sellerBill)
   var buser = await countAwkwardness(ctx, buyerBill)
-
-  // let suser = await User.findOne({
-  //   userId: sellerBill.userId
-  // })
-
-  // let buser = await User.findOne({
-  //   userId: buyerBill.userId
-  // })
 
   buser.charge += buyRes.totalProfit
   buser.charge -= buyRes.totalCommition
@@ -927,6 +897,9 @@ const onCharge = async userId => {
     }
   })
 
+  
+  var totalOPF = 0
+
   var od0 = 0
   var od1 = 0
   var avg0 = 0
@@ -942,11 +915,12 @@ const onCharge = async userId => {
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
     }
+    totalOPF += bill.left 
   })
 
   // margin
   var t = 15
-  var axl = Math.floor((user.charge * 0.9) / 1000)
+  var axl = Math.floor(((user.charge / totalOPF) * 0.9) / 1000)
   var awk, sellprice
 
   if (od0 == 0) {
@@ -1153,6 +1127,7 @@ module.exports = {
   makeDeal,
   onCharge,
   allUsersPDF,
+  reAnnounceBill,
   userToStringByUser,
   justPersian,
 

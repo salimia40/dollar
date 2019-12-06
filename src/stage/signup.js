@@ -100,7 +100,7 @@ const inputHandler = async (ctx, next) => {
           .extra()
       )
       ctx.session.stage = 'bankNameAsked'
-    } 
+    }
     // else if (user.docs.length == 0 && !ctx.session.docsConfirmed) {
     //   ctx.session.stage = 'docsAsked'
     //   await ctx.reply(
@@ -118,7 +118,7 @@ const inputHandler = async (ctx, next) => {
     //       }
     //     }
     //   )
-    // } 
+    // }
     else if (!user.acceptedTerms) {
       await helpers.asyncForEach(config.contract, async c => {
         await ctx.reply(c)
@@ -194,35 +194,41 @@ singnupScene.action(
       var owner = await User.findOne({
         role: config.role_owner
       })
+      var shOwners = await User.find({
+        role: config.role_shared_owner
+      })
+
       if (owner != undefined) {
-        ctx.telegram.sendMessage(
-          owner.userId,
-          `
-کاربر جدید با نام ${ctx.user.name}
-کد کاربری ${ctx.user.userId}
-شماره تماش ${ctx.user.phone}
- ثبت نام کرده است در صورت موافقت میتواند به فعالیت در ربات بپردازد
-            `,
-          Markup.inlineKeyboard([
-            [
-              {
-                text: 'موافقت',
-                callback_data: `accept-signup:${ctx.user.userId}`
-              },
-              {
-                text: 'در کردن',
-                callback_data: `decline-signup:${ctx.user.userId}`
-              }
-            ]
-          ])
-            .resize()
-            .extra()
-        )
-        ctx.user.docs.forEach(pid => {
-          ctx.telegram.sendPhoto(owner.userId, pid, {
-            caption: `مدرک ارسالی کاربر ${ctx.user.name}`
+        var msg = `
+        کاربر جدید با نام ${ctx.user.name}
+        کد کاربری ${ctx.user.userId}
+        شماره تماس ${ctx.user.phone}
+         ثبت نام کرده است در صورت موافقت میتواند به فعالیت در ربات بپردازد
+                    `
+
+        var keys = Markup.inlineKeyboard([
+          [
+            {
+              text: 'موافقت',
+              callback_data: `accept-signup:${ctx.user.userId}`
+            },
+            // {
+            //   text: 'در کردن',
+            //   callback_data: `decline-signup:${ctx.user.userId}`
+            // }
+          ]
+        ])
+          .resize()
+          .extra()
+
+        if (shOwners.length > 0) {
+          shOwners.forEach(o => {
+            ctx.telegram.sendMessage(o.userId, msg, keys)
           })
-        })
+        }
+
+        ctx.telegram.sendMessage(owner.userId, msg, keys)
+        
         ctx.reply(
           'ثبت نام شما با موفقیت انجام شد و در صورت تایید مدیریت ربات به شما اطلاع داده خواهد شد'
         )
@@ -256,9 +262,7 @@ singnupScene.action(
 singnupScene.enter(async ctx => {
   console.log('inside signup bot')
   if (ctx.user.name == undefined) {
-    ctx.reply(
-      'لطفا نام و نام خانوادگی  خود را وارد کنید'
-    )
+    ctx.reply('لطفا نام و نام خانوادگی  خود را وارد کنید')
     ctx.session.stage = 'nameAsked'
   }
 })

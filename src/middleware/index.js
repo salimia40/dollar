@@ -53,8 +53,8 @@ module.exports = {
             if (ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1) return next()
             else if (ctx.updateType == "callback_query") return next()
         } else {
-            if(( ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1 && /^.../.test(ctx.message.text))) return next()
             ctx.deleteMessage()
+            if(( ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1 && /^.../.test(ctx.message.text))) return next()
             if (ctx.updateType == "message" && ctx.updateSubTypes.includes('text') && ctx.updateSubTypes.length == 1) return next()
             else if (ctx.updateType == "callback_query") return next()
         }
