@@ -248,7 +248,7 @@ module.exports = async () => {
   bot.action('noreverse', ownerMiddleWare, privateMiddleWare, ctx => {
     ctx.deleteMessage()
   })
-  bot.action(/yupreverse:\d+/, ownerMiddleWare, privateMiddleWare, ctx => {
+  bot.action(/yupreverse:\d+/, ownerMiddleWare, privateMiddleWare, async ctx => {
     ctx.deleteMessage()
     
     var [_, code] = ctx.match[0].split(':')
