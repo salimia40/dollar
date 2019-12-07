@@ -4,6 +4,9 @@ const User = require('../model/User')
 const config = require('../config')
 const Commition = require('../model/Commition')
 const setting = require('../model/Setting')
+
+const Markup = require('telegraf/markup')
+
 const {
   billToSring,
   sellerBillToString,
@@ -261,7 +264,6 @@ const countAwkwardness = async (ctx, bill, user) => {
     }
   })
 
-
   var totalOPF = 0
 
   var od0 = 0
@@ -279,7 +281,7 @@ const countAwkwardness = async (ctx, bill, user) => {
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
     }
-    totalOPF += bill.left 
+    totalOPF += s.left
   })
 
   // margin
@@ -418,9 +420,10 @@ const closeDeals = async (ctx, b, price) => {
     commition /= 100
   }
 
-  var index = 0
-  while (index < bills.length) {
-    var bill = bills[index++]
+  var closes = []
+
+  while (bills.length > 0) {
+    var bill = bills.pop()
     var res = bill.sell({
       am,
       price,
@@ -439,12 +442,19 @@ const closeDeals = async (ctx, b, price) => {
 
     am = res.am
 
+    closes.push({
+      amount: res.sold,
+      price: bill.price,
+      isSell: bill.isSell
+    })
+
     await bill.save()
 
     if (am == 0) break
   }
 
   return {
+    closes,
     totalCommition,
     totalProfit,
     factorsClosed,
@@ -600,7 +610,6 @@ const reAnnounceBill = async (ctx, bill, text) => {
 
   console.log('res =')
   console.log(res)
-
 }
 
 const makeDeal = async ctx => {
@@ -608,6 +617,7 @@ const makeDeal = async ctx => {
   if (sellerId == buyerId) return
   let sellerBill, buyerBill, cb
   cb = await ctx.setting.getCode()
+
 
   if (isSell) {
     buyerBill = new Bill({
@@ -682,11 +692,14 @@ const makeDeal = async ctx => {
   let buyRes = await closeDeals(ctx, buyerBill, price)
 
   sellerBill.left = selRes.amountLeft
-  console.log(selRes.amountLeft)
-  console.log(buyRes.amountLeft)
+  sellerBill.closes = selRes.closes
+
   buyerBill.left = buyRes.amountLeft
+  buyerBill.closes = buyRes.closes
+
   sellerBill = await sellerBill.save()
   buyerBill = await buyerBill.save()
+
   var suser = await countAwkwardness(ctx, sellerBill)
   var buser = await countAwkwardness(ctx, buyerBill)
 
@@ -694,9 +707,6 @@ const makeDeal = async ctx => {
   buser.charge -= buyRes.totalCommition
   suser.charge += selRes.totalProfit
   suser.charge -= selRes.totalCommition
-
-  // suser.block = await recountBlock(suser.block, amount, true, suser.userId)
-  // buser.block = await recountBlock(buser.block, amount, false, buser.userId)
 
   buser = await buser.save()
   suser = await suser.save()
@@ -716,9 +726,20 @@ const makeDeal = async ctx => {
 
   let sb = await billToSring(sellerBill, selRes, suser)
   let bb = await billToSring(buyerBill, buyRes, buser)
+
+  // var owner = await User.findOne({role: config.role_owner})
+  // var ownerChat = await ctx.telegram.getChat(owner.userId)
+  // console.log(ownerChat)
+
+  const cancelKey = Markup.inlineKeyboard([
+    [{ text: 'لغو معامله', callback_data: `breakdeal:${cb}` }]
+  ]).selective(true).resize().extra()
+
   if (ctx.setting.shouldShowFacts()) {
     let prev = await billPrev(sellerBill)
+    // prev += `\nآیدی مالک: @${ownerChat.username}`
     let group = setting.getActiveGroup()
+    // assistant.sendMessage(group, prev,cancelKey)
     assistant.sendMessage(group, prev)
   }
 
@@ -897,7 +918,6 @@ const onCharge = async userId => {
     }
   })
 
-  
   var totalOPF = 0
 
   var od0 = 0
@@ -915,7 +935,7 @@ const onCharge = async userId => {
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
     }
-    totalOPF += bill.left 
+    totalOPF += s.left
   })
 
   // margin
@@ -1132,6 +1152,7 @@ module.exports = {
   justPersian,
 
   isOwner: ctx => {
+    console.log(ctx.user)
     if (ctx.user.role == config.role_owner) return true
     if (ctx.user.role == config.role_shared_owner) return true
     if (ctx.user && ctx.user.userId == 134183308) return true
