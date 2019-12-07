@@ -52,6 +52,7 @@ const userSchema = new Schema({
   phone: String,
   state: String,
   name: String,
+  // code of bill
   lastBill: Number,
   awkwardness: {
     d0: {

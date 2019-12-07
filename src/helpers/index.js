@@ -271,24 +271,44 @@ const countAwkwardness = async (ctx, bill, user) => {
   var avg0 = 0
   var avg1 = 0
 
+  var tot0 = 0
+  var tot1 = 0
+
   await asyncForEach(obills, s => {
     if (s.due == 0) {
       if (s.isSell) od0 += s.left
       else od0 -= s.left
       avg0 += (s.isSell ? s.left : 0 - s.left) * s.price
+
+      tot0 += bill.left
     } else {
       if (s.isSell) od1 += s.left
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
+
+      tot1 += bill.left
     }
     totalOPF += s.left
   })
 
   // margin
   var t = 15
-  var axl = Math.floor(((user.charge / totalOPF) * 0.9) / 1000)
+  var axl = Math.floor(((user.charge * 0.9) / totalOPF) / 1000)
   var awk, sellprice
 
+  console.log('__________________________________________________________')
+  console.info('counting awkwordness')
+  console.info('charge: ' + user.charge)
+  console.info('total open factors: ' + totalOPF)
+  console.info('margin: ' + t)
+  console.info('diff: ' + axl)
+
+  
+  console.info('total open factors today: ' + tot0)
+  console.info('avrage: ' + avg0)
+  console.info('total open factors today: ' + tot1)
+  console.info('avrage: ' + avg1)
+  
   if (od0 == 0) {
     user.awkwardness.d0 = {
       awk: 0,
@@ -331,6 +351,9 @@ const countAwkwardness = async (ctx, bill, user) => {
       awked: false,
       isSell: isSell1
     }
+
+    console.info(user.awkwardness)
+    console.log('__________________________________________________________')
   }
 
   user = await user.save()
@@ -618,7 +641,6 @@ const makeDeal = async ctx => {
   let sellerBill, buyerBill, cb
   cb = await ctx.setting.getCode()
 
-
   if (isSell) {
     buyerBill = new Bill({
       code: cb,
@@ -708,6 +730,9 @@ const makeDeal = async ctx => {
   suser.charge += selRes.totalProfit
   suser.charge -= selRes.totalCommition
 
+  buser.lastBill = cb
+  suser.lastBill = cb
+
   buser = await buser.save()
   suser = await suser.save()
   checkAwk(ctx, buser)
@@ -727,20 +752,16 @@ const makeDeal = async ctx => {
   let sb = await billToSring(sellerBill, selRes, suser)
   let bb = await billToSring(buyerBill, buyRes, buser)
 
-  // var owner = await User.findOne({role: config.role_owner})
-  // var ownerChat = await ctx.telegram.getChat(owner.userId)
-  // console.log(ownerChat)
-
-  const cancelKey = Markup.inlineKeyboard([
-    [{ text: 'لغو معامله', callback_data: `breakdeal:${cb}` }]
-  ]).selective(true).resize().extra()
-
   if (ctx.setting.shouldShowFacts()) {
+    const cancelKey = Markup.inlineKeyboard([
+      [{ text: 'لغو معامله', callback_data: `breakdeal:${cb}` }]
+    ])
+      .resize()
+      .extra()
+
     let prev = await billPrev(sellerBill)
-    // prev += `\nآیدی مالک: @${ownerChat.username}`
     let group = setting.getActiveGroup()
-    // assistant.sendMessage(group, prev,cancelKey)
-    assistant.sendMessage(group, prev)
+    assistant.sendMessage(group, prev, cancelKey)
   }
 
   try {
@@ -939,8 +960,11 @@ const onCharge = async userId => {
   })
 
   // margin
+
   var t = 15
-  var axl = Math.floor(((user.charge / totalOPF) * 0.9) / 1000)
+
+  var axl = Math.floor(((user.charge * 0.9) / totalOPF) / 1000)
+
   var awk, sellprice
 
   if (od0 == 0) {
@@ -954,7 +978,7 @@ const onCharge = async userId => {
     var isSell0 = od0 > 0
     avg0 /= od0
     awk = isSell0 ? avg0 + axl : avg0 - axl
-    sellprice = ~!isSell0 ? awk + t : awk - t
+    sellprice = isSell0 ? awk + t : awk - t
     sellprice = isSell0 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell0 ? Math.floor(awk) : Math.ceil(awk)
     user.awkwardness.d0 = {
@@ -976,7 +1000,7 @@ const onCharge = async userId => {
     var isSell1 = od1 > 0
     avg1 /= od1
     awk = isSell1 ? avg1 + axl : avg1 - axl
-    sellprice = !isSell1 ? awk + t : awk - t
+    sellprice = isSell1 ? awk + t : awk - t
     sellprice = isSell1 ? Math.floor(sellprice) : Math.ceil(sellprice)
     awk = isSell1 ? Math.floor(awk) : Math.ceil(awk)
     user.awkwardness.d1 = {
@@ -1042,6 +1066,8 @@ const checkAwkWithDue = async (ctx, user, due) => {
       amount += bill.left
     })
 
+    user.awkwardness[`d${due}`].awked = true
+
     var price = Math.round(user.awkwardness[`d${due}`].sellprice)
     if (amount > 0) {
       var c = await ctx.setting.getCode()
@@ -1063,16 +1089,19 @@ const checkAwkWithDue = async (ctx, user, due) => {
       user.userId,
       `فاکتورهای ${due == 0 ? 'امروزی' : 'فردایی'} شما حراج شد`
     )
+    await user.save()
   } else if (shouldalarm) {
     ctx.telegram.sendMessage(
       user.userId,
       `
-همکار گرامی ((${user.name}))
-مقدار مظنه جدید درحال نزدیک شدن به مظنه حراج ${due == 0 ? 'امروزی' : 'فردایی'}
-در صورت رسیدن مظنه به ${toman(
-        user.awkwardness.awk
-      )} فاکتور های شما به حراج میرسد
-مظنه فعلی: ${toman(v)}
+        همکار گرامی ((${user.name}))
+        مقدار مظنه جدید درحال نزدیک شدن به مظنه حراج ${
+          due == 0 ? 'امروزی' : 'فردایی'
+        }
+        در صورت رسیدن مظنه به ${toman(
+          user.awkwardness[`d${due}`].awk
+        )} فاکتور های شما به حراج میرسد
+        مظنه فعلی: ${toman(v)}
     `
     )
   }

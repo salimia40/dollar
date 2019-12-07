@@ -1,4 +1,4 @@
-module.exports = async token => {
+module.exports = async () => {
   const Telegraf = require('telegraf'),
     middlewares = require('./middleware'),
     stage = require('./stage'),
@@ -14,7 +14,7 @@ module.exports = async token => {
     LocalSession = require('telegraf-session-local'),
     Markup = require('telegraf/markup'),
     hears = require('./hear'),
-    bot = new Telegraf(token),
+    bot = require('./mainBot'),
     { enter } = require('telegraf/stage'),
     akeys = config.adminKeys,
     cron = require('./cron')
@@ -245,6 +245,61 @@ module.exports = async token => {
 
   //actions
   bot.action('confirm', ownerMiddleWare, privateMiddleWare, actions.confirm)
+  bot.action('noreverse', ownerMiddleWare, privateMiddleWare, ctx => {
+    ctx.deleteMessage()
+  })
+  bot.action(/yupreverse:\d+/, ownerMiddleWare, privateMiddleWare, ctx => {
+    ctx.deleteMessage()
+    
+    var [_, code] = ctx.match[0].split(':')
+    code = +code
+
+    var bills = await Bill.find({ code })
+    if (bills.length !== 2) {
+      // bills not found
+      ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
+    }
+    const isReversable = async bill => {
+      var user = User.findById(bill.userId)
+      return {reversable: user.lastBill && user.lastBill == bill.code,
+      user}
+    }
+
+    const reverseBill = async (bill,user) => {
+      var closes = bill.closes
+      while (closes.length > 0) {
+        var closed = closes.pop()
+        var b = new Bill({
+          ...closed,
+          code: ctx.setting.getCode(),
+          left: closed.amount,
+          closed: true,
+          due: bill.due,
+          condition: 'برگشتی'
+        })
+        await b.save()
+      }
+      bill.left = 0
+      bill.condition = 'لغو شده'
+      user.charge -= bill.profit
+      user.lastBill = null
+      user = await helpers.countAwkwardness(ctx,null,user)
+      await user.save()
+      
+    }
+
+    var rev0 = await isReversable(bills[0])
+    var rev1 = await isReversable(bills[1])
+    
+    if (rev0.reversable && rev1.reversable) {
+      reverseBill(bills[0],rev0.user)
+      reverseBill(bills[1],rev1.user)
+      ctx.reply(`معامله با کد ${code} لغو شد`)
+    } else {
+      ctx.answerCbQuery('به دلیل معامله های بعدی لغو معامله امکان پذیر نیست...')
+      
+    }
+  })
   bot.action('cancel', privateMiddleWare, actions.cancel)
   bot.action(
     /confirmtransaction:\d+/,

@@ -59,7 +59,7 @@ const billSchema = new Schema({
     {
       amount: Number,
       price: Number,
-      isSell: Boolean
+      isSell: Boolean,
     }
   ],
   date: {

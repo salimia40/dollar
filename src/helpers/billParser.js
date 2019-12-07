@@ -242,7 +242,7 @@ const billToSring = async (bill, result, user) => {
       .replace('x', isSell ? 'فروش' : 'خرید')
       .replace('x', 'امروزی')
       .replace('x', isSell ? 'فروش' : 'خرید')
-      .replace('x', Math.abs(avg0))
+      .replace('x', toman(avg0))
       .replace('x', toman(user.awkwardness.d0.awk))
       .replace('x', toman(user.awkwardness.d0.sellprice))
   }
@@ -255,7 +255,7 @@ const billToSring = async (bill, result, user) => {
       .replace('x', isSell ? 'فروش' : 'خرید')
       .replace('x', 'فردایی')
       .replace('x', isSell ? 'فروش' : 'خرید')
-      .replace('x', Math.abs(avg1))
+      .replace('x', toman(avg1))
       .replace('x', toman(user.awkwardness.d1.awk))
       .replace('x', toman(user.awkwardness.d1.sellprice))
   }
