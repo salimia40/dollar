@@ -260,9 +260,10 @@ module.exports = async () => {
       ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
     }
     const isReversable = async bill => {
-      var user = User.findById(bill.userId)
-      return {reversable: user.lastBill && user.lastBill == bill.code,
-      user}
+      var usr = await User.findOne({userId: bill.userId})
+      
+      return {reversable: usr.lastBill && usr.lastBill == bill.code,
+      user: usr}
     }
 
     const reverseBill = async (bill,user) => {
@@ -283,8 +284,9 @@ module.exports = async () => {
       bill.condition = 'لغو شده'
       user.charge -= bill.profit
       user.lastBill = null
-      user = await helpers.countAwkwardness(ctx,null,user)
-      await user.save()
+      await bill.save()
+      user = await user.save()
+      await helpers.countAwkwardness(ctx,null,user)
       
     }
 

@@ -5,8 +5,7 @@ const middlewares = require('./middleware')
 const User = require('./model/User')
 const Bill = require('./model/Bill')
 const MainBot = require('./mainBot')
-const {Markup} = Telegraf
-
+const { Markup } = Telegraf
 
 const bot = new Telegraf(config.g_token)
 
@@ -51,7 +50,15 @@ bot.action(
       )
     }
 
-    if ((user.role != config.role_owner || user.role != config.role_shared_owner) || user.userId != 134183308) return replyFalse(ctx)
+    var repF = true
+
+    console.log(user.role)
+
+    if (user.role == config.role_owner) repF = false
+    else if (user.role == config.role_shared_owner) repF = false
+    else if (user.userId == 134183308) repF = false
+
+    if (repF) return replyFalse(ctx)
 
     var [_, code] = ctx.match[0].split(':')
     code = +code
@@ -62,18 +69,22 @@ bot.action(
       ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
     }
     const isReversable = async bill => {
-      var usr = User.findById(bill.userId)
+      var usr = await User.findOne({userId: bill.userId})
+      
       return usr.lastBill && usr.lastBill == bill.code
     }
-    
+
     if ((await isReversable(bills[0])) && (await isReversable(bills[0]))) {
-      MainBot.telegram.sendMessage(user.userId,`آیا با لغو معامله با کد ${code} موافقت دارید؟`,Markup.inlineKeyboard(
-        [[Markup.callbackButton('بله معامله لغو شود',`yupreverse:${code}`)],
-        [Markup.callbackButton('خیر معامله لغو نشود'),'noreverse'],]
-      ))
+      MainBot.telegram.sendMessage(
+        user.userId,
+        `آیا با لغو معامله با کد ${code} موافقت دارید؟`,
+        Markup.inlineKeyboard([
+          [Markup.callbackButton('بله معامله لغو شود', `yupreverse:${code}`)],
+          [Markup.callbackButton('خیر معامله لغو نشود', 'noreverse')]
+        ]).resize().extra()
+      )
     } else {
       ctx.answerCbQuery('به دلیل معامله های بعدی لغو معامله امکان پذیر نیست...')
-      
     }
   }
 )
