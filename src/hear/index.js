@@ -336,47 +336,69 @@ module.exports = {
     )
   },
   goldInv: async ctx => {
-    let bills = await Bill.find({
-      userId: ctx.message.from.id,
-      isSell: false,
-      closed: true,
-      left: {
-        $gt: 0
-      }
-    })
-    let count = 0
 
-    for (var i = 0; i < bills.length; i++) {
-      count += bills[i].left
+    
+  let bills = await Bill.find({
+    userId: ctx.user.userId,
+    closed: true,
+    left: {
+      $gt: 0
     }
+  })
 
-    if (count == 0) {
-      bills = await Bill.find({
-        userId: ctx.message.from.id,
-        isSell: true,
-        closed: true,
-        left: {
-          $gt: 0
-        }
-      })
-
-      await helpers.asyncForEach(bills, bill => {
-        count += bill.left
-      })
-      count = 0 - count
+  var tot0 = 0
+  var tot1 = 0
+  while (bills.length > 0) {
+    var b = bills.pop()
+    if (b.due == 0) {
+      if (b.isSell) tot0 += b.left
+      else tot0 -= b.left
+      avg0 += (b.isSell ? b.left : 0 - b.left) * b.price
+    } else {
+      if (b.isSell) tot1 += b.left
+      else tot1 -= b.left
+      avg1 += (b.isSell ? b.left : 0 - b.left) * b.price
     }
-    var msg
-    if (count < 0) {
-      msg = `${Math.abs(count)}  واحد فروش`
-    } else if (count == 0) {
-      msg = `صفر واحد`
-    } else msg = `${Math.abs(count)}  واحد خرید`
+  }
 
-    var es =
-      count < 0 ? await helpers.maxCanSell(ctx) : await helpers.maxCanBuy(ctx)
+  var msg = `موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
+  موجودی ${tot1 > 0 ? 'فروش' : 'خرید'} فردایی: ${Math.abs(tot1)}
+  موجودی آزاد خرید: ${await helpers.maxCanBuy(ctx)}
+  موجودی آزاد فروش: ${await helpers.maxCanSell(ctx)}
+  `
 
-    // var mcb = Math.floor(ctx.user.charge / ctx.setting.getBaseCharge())
-    msg += `\n موجودی آزاد ${es} واحد`
+  
+    // for (var i = 0; i < bills.length; i++) {
+    //   count += bills[i].left
+    // }
+
+    // if (count == 0) {
+    //   bills = await Bill.find({
+    //     userId: ctx.message.from.id,
+    //     isSell: true,
+    //     closed: true,
+    //     left: {
+    //       $gt: 0
+    //     }
+    //   })
+
+    //   await helpers.asyncForEach(bills, bill => {
+    //     count += bill.left
+    //   })
+    //   count = 0 - count
+    // }
+    // var msg
+    // if (count < 0) {
+    //   msg = `${Math.abs(count)}  واحد فروش`
+    // } else if (count == 0) {
+    //   msg = `صفر واحد`
+    // } else msg = `${Math.abs(count)}  واحد خرید`
+
+    // var es =
+    //   count < 0 ? await helpers.maxCanSell(ctx) : await helpers.maxCanBuy(ctx)
+
+    // // var mcb = Math.floor(ctx.user.charge / ctx.setting.getBaseCharge())
+    // msg += `\n موجودی آزاد ${es} واحد`
 
     ctx.reply(msg)
   },

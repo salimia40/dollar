@@ -120,7 +120,7 @@ const allUsersPDF = async users => {
         role = 'مالک'
         break
       case config.role_shared_owner:
-        role = 'مالک شراکتی'
+        role = 'مالک'
         break
       case config.role_admin:
         role = 'مدیر'
@@ -280,13 +280,13 @@ const countAwkwardness = async (ctx, bill, user) => {
       else od0 -= s.left
       avg0 += (s.isSell ? s.left : 0 - s.left) * s.price
 
-      tot0 += bill.left
+      tot0 += s.left
     } else {
       if (s.isSell) od1 += s.left
       else od1 -= s.left
       avg1 += (s.isSell ? s.left : 0 - s.left) * s.price
 
-      tot1 += bill.left
+      tot1 += s.left
     }
     totalOPF += s.left
   })
