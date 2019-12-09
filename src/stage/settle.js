@@ -62,8 +62,8 @@ scene.hears(
         userId: user.userId,
         // closed: true,
         expired: false,
-        settled: false,
-        due: 0
+        settled: false
+        // due: 0
       })
 
       var comm = commition
@@ -93,10 +93,12 @@ scene.hears(
         var bill = bills[index]
         if (bill == undefined) continue
         if (bill.closed) {
-          var res = bill.close({
-            comm,
-            price
-          })
+          //** فاکتور باز فردایی رو شامل نمیشه :) */
+          if (bill.due == 0 || bill.left == 0)
+            var res = bill.close({
+              comm,
+              price
+            })
           newProfit += res.profit
           newCommition += res.commition
           sold += res.am
@@ -131,13 +133,11 @@ scene.hears(
       settle = await settle.save()
       botProfit += totalCommition
 
-      
       var title = isSell ? '🔴 فروشنده' : '🔵 خریدار'
-      
+
       if (sold > 0) ms.push(`${title} : ${user.name} ✅ تعداد: ${sold} \n`)
       am += sold
 
-      
       var prf = newProfit - newCommition
       var d = prf > 0 ? 'سود' : 'ضرر'
       prf = Math.abs(prf)
@@ -152,15 +152,13 @@ x مقدار  x  : x واحد به قیمت : x
         
 💶 موجودی شما برابر است با : x`
 
-pallet = `سلام آقا/خانم x
+      pallet = `سلام آقا/خانم x
 
 شما روز date
 
 با تسویه به نرخ price
 
-مبلغ : profit تومان.
-
-x کرده اید
+مبلغ : profit تومان x کرده اید.
 
 ضمن عرض سلام و خسته نباشید 
 
@@ -174,7 +172,6 @@ x کرده اید
 @hesabdar2244
  اتاق معاملاتی ارز آنلاین`
 
-
       // var umsg = pallet
       //   .replace('x', user.name)
       //   .replace('x', isSell ? '🔴' : '🔵')
@@ -185,19 +182,19 @@ x کرده اید
       //   .replace('x', d)
       //   .replace('x', helpers.toman(user.charge))
 
-      var bu = await user.findOne({role: config.role_bot})
-      bu.charge = 0
-      await bu.save()
-
       var umsg = pallet
-      .replace('x', user.name)
-          .replace('date', helpers.dateToString(Date.now()))
-          .replace('price', helpers.toman(c))
-          .replace('profit', helpers.toman(prf))
-          .replace('x', d)
+        .replace('x', user.name)
+        .replace('date', helpers.dateToString(Date.now()))
+        .replace('price', helpers.toman(c))
+        .replace('profit', helpers.toman(prf))
+        .replace('x', d)
 
       ctx.telegram.sendMessage(user.userId, umsg)
     })
+
+    var bu = await User.findOne({ role: config.role_bot })
+    bu.charge = 0
+    await bu.save()
 
     ms.push(`تعداد ${am} فاکتور بسته شد 
 قیمت ${c}
