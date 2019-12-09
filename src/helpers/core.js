@@ -143,7 +143,7 @@ const maxCanDeal = async (ctx, closed = true) => {
 
   while (bills.length > 0) {
     var bill = bills.pop()
-    if( bill.isSell) {
+    if (bill.isSell) {
       am += bill.left
     } else {
       am -= bill.left
@@ -152,8 +152,8 @@ const maxCanDeal = async (ctx, closed = true) => {
 
   console.log(am)
 
-  return {am,mx}
- 
+  return { am, mx }
+
   mx -= Math.abs(am)
 
   if (mx < 0) mx = 0
@@ -161,18 +161,17 @@ const maxCanDeal = async (ctx, closed = true) => {
 }
 
 const maxCanBuy = async (ctx, closed = true) => {
-  var {am,mx} = await maxCanDeal(ctx, closed)
-  mx += am
-  
+  var { am, mx } = await maxCanDeal(ctx, closed)
+  if (am < 0) mx += am
+
   if (mx < 0) mx = 0
   return mx
-  
 }
 
 const maxCanSell = async (ctx, closed = true) => {
-  var {am,mx} = await maxCanDeal(ctx, closed)
-  mx -= am
-  
+  var { am, mx } = await maxCanDeal(ctx, closed)
+  if (am > 0) mx -= am
+
   if (mx < 0) mx = 0
   return mx
 }

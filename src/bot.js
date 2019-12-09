@@ -287,15 +287,15 @@ module.exports = async () => {
         await b.save()
       }
       // user.charge += bill.commition
-      user.charge -= bill.profit
+      user.charge -= user.lastProfit
       bill.left = 0
       bill.condition = 'لغو شده'
-      bill.profit = 0
-      bill.commition = 0
+      // bill.profit = 0
+      // bill.commition = 0
       user.lastBill = null
       await bill.save()
-      user = await user.save()
-      await helpers.countAwkwardness(ctx,null,user)
+      user = await helpers.countAwkwardness(ctx,null,user)
+      await user.save()
     }
 
     var rev0 = await isReversable(bills[0])

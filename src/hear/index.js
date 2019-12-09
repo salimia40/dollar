@@ -353,11 +353,9 @@ module.exports = {
     if (b.due == 0) {
       if (b.isSell) tot0 += b.left
       else tot0 -= b.left
-      avg0 += (b.isSell ? b.left : 0 - b.left) * b.price
     } else {
       if (b.isSell) tot1 += b.left
       else tot1 -= b.left
-      avg1 += (b.isSell ? b.left : 0 - b.left) * b.price
     }
   }
 

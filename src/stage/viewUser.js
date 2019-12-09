@@ -54,15 +54,13 @@ scene.hears(
         if (b.due == 0) {
           if (b.isSell) tot0 += b.left
           else tot0 -= b.left
-          avg0 += (b.isSell ? b.left : 0 - b.left) * b.price
         } else {
           if (b.isSell) tot1 += b.left
           else tot1 -= b.left
-          avg1 += (b.isSell ? b.left : 0 - b.left) * b.price
         }
       }
 
-      msg += `\n موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
+      msg += ` موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
 موجودی ${tot1 > 0 ? 'فروش' : 'خرید'} فردایی: ${Math.abs(tot1)}
 موجودی آزاد خرید: ${await helpers.maxCanBuy(ctx)}
 موجودی آزاد فروش: ${await helpers.maxCanSell(ctx)}

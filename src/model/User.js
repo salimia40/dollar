@@ -54,6 +54,7 @@ const userSchema = new Schema({
   name: String,
   // code of bill
   lastBill: Number,
+  lastProfit: Number,
   awkwardness: {
     d0: {
       awk: Number,
