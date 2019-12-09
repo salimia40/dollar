@@ -268,10 +268,16 @@ module.exports = async () => {
 
     const reverseBill = async (bill,user) => {
       var closes = bill.closes
+      console.log(closes)
       while (closes.length > 0) {
         var closed = closes.pop()
+        console.log(closed)
+        if(closed == undefined) continue
         var b = new Bill({
-          ...closed,
+          userId: user.userId,
+          price: closed.price,
+          amount: closed.amount,
+          isSell: closed.isSell,
           code: ctx.setting.getCode(),
           left: closed.amount,
           closed: true,
@@ -280,14 +286,16 @@ module.exports = async () => {
         })
         await b.save()
       }
+      // user.charge += bill.commition
+      user.charge -= bill.profit
       bill.left = 0
       bill.condition = 'لغو شده'
-      user.charge -= bill.profit
+      bill.profit = 0
+      bill.commition = 0
       user.lastBill = null
       await bill.save()
       user = await user.save()
       await helpers.countAwkwardness(ctx,null,user)
-      
     }
 
     var rev0 = await isReversable(bills[0])

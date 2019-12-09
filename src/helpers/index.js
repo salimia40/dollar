@@ -475,6 +475,8 @@ const closeDeals = async (ctx, b, price) => {
     if (am == 0) break
   }
 
+  console.log(closes)
+
   return {
     closes,
     totalCommition,
