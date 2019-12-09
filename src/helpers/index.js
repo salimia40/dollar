@@ -731,8 +731,10 @@ const makeDeal = async ctx => {
 
   buser.charge += buyRes.totalProfit
   buser.charge -= buyRes.totalCommition
-  buser.lastProfit = buser.totalProfit
+
+  buser.lastProfit = buyRes.totalProfit
   suser.lastProfit = selRes.totalProfit
+
   suser.charge += selRes.totalProfit
   suser.charge -= selRes.totalCommition
 

@@ -294,8 +294,8 @@ module.exports = async () => {
       // bill.commition = 0
       user.lastBill = null
       await bill.save()
-      user = await helpers.countAwkwardness(ctx,null,user)
-      await user.save()
+      user = await user.save()
+      await helpers.countAwkwardness(ctx,null,user)
     }
 
     var rev0 = await isReversable(bills[0])
@@ -840,7 +840,8 @@ module.exports = async () => {
     )
     while (bills.length > 0) {
       var bill = bills.pop()
-      bill.due--
+      if (bill == undefined) continue
+      bill.due = 0
       await bill.save()
     }
     var users = await User.find()

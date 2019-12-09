@@ -86,7 +86,7 @@ module.exports = {
           ts1.push({ amount: bill.left, price: bill.price })
         } else if (!bill.isSell && bill.due == 0) {
           tf0.push({ amount: bill.left, price: bill.price })
-        } else if (bill.isSell && bill.due == 1) {
+        } else if (!bill.isSell && bill.due == 1) {
           tf1.push({ amount: bill.left, price: bill.price })
         }
       }
