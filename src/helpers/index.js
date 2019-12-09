@@ -293,7 +293,7 @@ const countAwkwardness = async (ctx, bill, user) => {
 
   // margin
   var t = 15
-  var axl = Math.floor(((user.charge * 0.9) / totalOPF) / 1000)
+  var axl = Math.floor((user.charge * 0.9) / totalOPF / 1000)
   var awk, sellprice
 
   console.log('__________________________________________________________')
@@ -303,12 +303,11 @@ const countAwkwardness = async (ctx, bill, user) => {
   console.info('margin: ' + t)
   console.info('diff: ' + axl)
 
-  
   console.info('total open factors today: ' + tot0)
   console.info('avrage: ' + avg0)
   console.info('total open factors today: ' + tot1)
   console.info('avrage: ' + avg1)
-  
+
   if (od0 == 0) {
     user.awkwardness.d0 = {
       awk: 0,
@@ -611,17 +610,20 @@ const reAnnounceBill = async (ctx, bill, text) => {
     ' ' +
     bill.price +
     ' </b> ' +
-    due +
-    '( مانده ' +
-    bill.amount +
-    ')'
+    due
+
+  if (!bill.expired) msg += '( مانده ' + bill.amount + ')'
+  else {
+    msg += '(منقضی شد)'
+  }
+
   if (bill.condition != 'عادی') {
     msg = '(آگهی خودکار) \n' + msg
   }
 
-  if (text != undefined) {
-    msg += `  (${text})`
-  }
+  // if (text != undefined) {
+  //   msg += `  (${text})`
+  // }
 
   const extra = require('telegraf/extra')
   const markup = extra.HTML()
@@ -963,7 +965,7 @@ const onCharge = async userId => {
 
   var t = 15
 
-  var axl = Math.floor(((user.charge * 0.9) / totalOPF) / 1000)
+  var axl = Math.floor((user.charge * 0.9) / totalOPF / 1000)
 
   var awk, sellprice
 

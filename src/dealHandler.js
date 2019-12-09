@@ -59,14 +59,15 @@ const parsLafz = l => {
   }
 }
 
-handler.use((ctx, next) => {
-  try {
-    ctx.deleteMessage()
-  } catch (error) {
-    //
-  }
-  next()
-})
+// handler.use((ctx, next) => {
+//   console.log(ctx.message.text)
+//   try {
+//     ctx.deleteMessage()
+//   } catch (error) {
+//     //
+//   }
+//   next()
+// })
 
 handler.hears(
   /\d+\s*(ف|خ)\s*\d+/,

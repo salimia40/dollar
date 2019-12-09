@@ -162,7 +162,7 @@ const maxCanDeal = async (ctx, closed = true) => {
 
 const maxCanBuy = async (ctx, closed = true) => {
   var {am,mx} = await maxCanDeal(ctx, closed)
-  mx -= am
+  mx += am
   
   if (mx < 0) mx = 0
   return mx

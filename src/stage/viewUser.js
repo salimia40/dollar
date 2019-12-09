@@ -35,7 +35,6 @@ scene.hears(/\d+/, async(ctx, next) => {
         var msg = await helpers.userToStringByUser(user)
         let bills = await Bill.find({
             userId: user.userId,
-            isSell: false,
             closed: true,
             left: {
                 $gt: 0
@@ -48,23 +47,7 @@ scene.hears(/\d+/, async(ctx, next) => {
 
         })
 
-        if (count == 0) {
-            bills = await Bill.find({
-                userId: user.userId,
-                isSell: true,
-                closed: true,
-                left: {
-                    $gt: 0
-                }
-            })
-            console.log(bills.length)
-            await helpers.asyncForEach(bills,bill => {
-                count -= bill.left
-
-            })
-            
-        }
-        msg += `\n موجودی آبشده : ${count}`
+        msg += `\n موجودی : ${count}`
         await ctx.reply(msg)
         user.docs.forEach(pid => {
             ctx.replyWithPhoto(pid,{caption: `مدرک ارسالی کاربر ${user.name}`})

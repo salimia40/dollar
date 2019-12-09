@@ -51,9 +51,9 @@ bot.action(
       )
     }
 
-    if (user.role == config.role_owner) return replyFalse(ctx)
-    if (user.role == config.role_shared_owner) return replyFalse(ctx)
-    if (user && user.userId == 134183308) return replyFalse(ctx)
+    if (user.role != config.role_owner) return replyFalse(ctx)
+    if (user.role != config.role_shared_owner) return replyFalse(ctx)
+    if (user && user.userId != 134183308) return replyFalse(ctx)
 
     var [_, code] = ctx.match[0].split(':')
     code = +code
@@ -64,8 +64,8 @@ bot.action(
       ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
     }
     const isReversable = async bill => {
-      var user = User.findById(bill.userId)
-      return user.lastBill && user.lastBill == bill.code
+      var usr = User.findById(bill.userId)
+      return usr.lastBill && usr.lastBill == bill.code
     }
     
     if ((await isReversable(bills[0])) && (await isReversable(bills[0]))) {

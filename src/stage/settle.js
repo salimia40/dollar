@@ -123,6 +123,7 @@ scene.hears(
 
       var settle = new Settle({
         price,
+        date: Date.now(),
         userId: user.userId,
         commition: totalCommition,
         profit: totalProfit
@@ -184,9 +185,13 @@ x کرده اید
       //   .replace('x', d)
       //   .replace('x', helpers.toman(user.charge))
 
+      var bu = await user.findOne({role: config.role_bot})
+      bu.charge = 0
+      await bu.save()
+
       var umsg = pallet
       .replace('x', user.name)
-          .replace('date', helpers.dateToString(settle.date))
+          .replace('date', helpers.dateToString(Date.now()))
           .replace('price', helpers.toman(c))
           .replace('profit', helpers.toman(prf))
           .replace('x', d)
