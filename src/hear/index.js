@@ -410,7 +410,7 @@ module.exports = {
             [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
             [akeys.activateAuto, akeys.deactivateAuto],
             [akeys.setBotCard, akeys.getSettings],
-            [akeys.decdue],
+            // [akeys.decdue],
             [keys.back]
           ])
             .resize()

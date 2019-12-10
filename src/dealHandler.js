@@ -127,17 +127,12 @@ handler.hears(
 
     console.log('offer by amount')
 
-    if (bill == undefined) {
+    if (bill == undefined || bill.closed || bill.expired) {
+      // faker.forceDeal(ctx.message.reply_to_message.message_id)
+      if(bill.expired) helpers.reAnnounceBill(ctx,bill,'منقضی شد')
       return
     }
-    if (bill.closed) {
-      await helpers.reAnnounceBill(ctx, bill, 'منقضی شد')
-      return
-    }
-    if (bill.expired) {
-      await helpers.reAnnounceBill(ctx, bill, 'منقضی شد')
-      return
-    }
+
     let amount = bill.amount
     // if (bill.sellAsWhole && bill.amount != amount) return
     // if (!bill.sellAsWhole && bill.amount < amount) return

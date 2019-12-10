@@ -43,6 +43,8 @@ scene.hears(
     c = +c
     var price = c
 
+    var card = ctx.setting.getCard()
+
     var users = await User.find()
     var botUsr = await User.findOne({
       role: config.role_bot
@@ -168,9 +170,9 @@ scene.hears(
  جهت دریافت سود به ایدی زیر اطلاع دهید.
  @hesabdar2244
  * جهت پرداخت ضرر لطفا مبلغ را به شماره کارت زیر واریز کنید.
- 6037-6915-4987-4626
+ ${card.card}
  
- آیدین فرهادی  
+ ${card.owner}  
  لطفا از رسید پرداخت خود عکس گرفته و به آیدی زیر ارسال کنین:
  @hesabdar2244
  اتاق معاملاتی ارز آنلاین`
