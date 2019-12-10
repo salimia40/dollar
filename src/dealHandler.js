@@ -137,8 +137,19 @@ handler.hears(
     // if (bill.sellAsWhole && bill.amount != amount) return
     // if (!bill.sellAsWhole && bill.amount < amount) return
 
-    let mx = await helpers.maxCanSell(ctx)
-    let mcb = await helpers.maxCanBuy(ctx)
+    
+    var max = await helpers.getMax(ctx,false)
+
+    let mx =
+      due == 0
+        ? max.mCST
+        : max.mCSM
+    
+    let mcb =
+      due == 0
+        ? max.mCBT
+        : max.mCBM
+        
     // let bc = await ctx.setting.getBaseCharge()
     let bc =
       ctx.user.config.baseCharge == -1
