@@ -140,41 +140,120 @@ const maxCanDeal = async (ctx, closed = true) => {
   if (closed) query.closed = true
   let bills = await Bill.find({ ...query })
   let am = 0
+  let ams = 0
+  let amf = 0
+  // today
+  let amft = 0
+  let amst = 0
+  // tomrrow
+  let amsm = 0
+  let amfm = 0
 
   while (bills.length > 0) {
     var bill = bills.pop()
+    am += bill.left
     if (bill.isSell) {
-      am += bill.left
+      ams += bill.left
+      if(bill.due == 0) {
+        amst += bill.left
+      } else {
+        amsm += bill.left
+      }
     } else {
-      am -= bill.left
+      amf += bill.left
+      if(bill.due == 0) {
+        amft += bill.left
+      } else {
+        amfm += bill.left
+      }
     }
   }
 
   console.log(am)
 
-  return { am, mx }
+  return { am, mx ,amf,ams,amfm,amft,amsm,amst }
+}
 
-  mx -= Math.abs(am)
-
-  if (mx < 0) mx = 0
-  return mx
+const getMax = async (ctx,closed = true) => {
+  var { am, mx,amf,ams ,amfm,amft,amsm,amst } = await maxCanDeal(ctx, closed)
+  var free = mx - am
+  if (free < 0) free = 0
+  var mCBT = amft > 0 ? free : free + amst
+  var mCBM = amfm > 0 ? free : free + amsm
+  var mCST = amst > 0 ? free : free + amft
+  var mCSM = amsm > 0 ? free : free + amfm
+  var res = {
+    mCSM,mCST,mCBM,mCBT,mx
+  }
+  console.log(res)
+  return res
 }
 
 const maxCanBuy = async (ctx, closed = true) => {
-  var { am, mx } = await maxCanDeal(ctx, closed)
-  if (am < 0) mx += am
+  var { am, mx,amf,ams } = await maxCanDeal(ctx, closed)
+  if (am < 0) {
+    mx += am
+    if (mx < 0) mx = 0
+    return mx
+  } else return am
+}
 
-  if (mx < 0) mx = 0
-  return mx
+const maxCanBuyToday = async (ctx, closed = true) => {
+  var { am, mx,amf,ams ,amfm,amft,amsm,amst } = await maxCanDeal(ctx, closed)
+
+  var free = mx - am
+  
+  if (free < 0) free = 0
+
+  var tal = amst - amft
+
+  var res = free + tal
+  
+  return (res < 0) ?  0 : res 
+}
+
+const maxCanBuyTomorrow = async (ctx, closed = true) => {
+    var { am, mx,amf,ams ,amfm,amft,amsm,amst } = await maxCanDeal(ctx, closed)
+  var free = mx - am
+  if (free < 0) free = 0
+
+  var tal = amsm - amfm
+  
+  var res = free + tal
+  return (res < 0) ?  0 : res 
+}
+
+const maxCanSellToday = async (ctx, closed = true) => {
+    var { am, mx,amf,ams ,amfm,amft,amsm,amst } = await maxCanDeal(ctx, closed)
+  var free = mx - am
+  if (free < 0) free = 0
+
+  var tal = amft + amst  
+  
+  var res = free + tal
+  return (res < 0) ?  0 : res 
+}
+
+const maxCanSellTomorrow = async (ctx, closed = true) => {
+    var { am, mx,amf,ams ,amfm,amft,amsm,amst } = await maxCanDeal(ctx, closed)
+  var free = mx - am
+  if (free < 0) free = 0
+
+  var tal = amfm - amsm
+  
+  var res = free + tal
+  return (res < 0) ?  0 : res 
 }
 
 const maxCanSell = async (ctx, closed = true) => {
   var { am, mx } = await maxCanDeal(ctx, closed)
-  if (am > 0) mx -= am
-
-  if (mx < 0) mx = 0
-  return mx
+  if (am > 0) {
+    mx -= am
+    if (mx < 0) mx = 0
+    return mx
+  } else return Math.abs(am)
 }
+
 const buyAvg = async userId => {
   let mgs = await Bill.find({
     userId,
@@ -231,6 +310,10 @@ module.exports = {
   parseLafz,
   maxCanBuy,
   maxCanSell,
+  maxCanBuyToday,
+  maxCanBuyTomorrow,
+  maxCanSellToday,
+  maxCanSellTomorrow,
   buyAvg,
-  sellAvg
+  sellAvg,getMax
 }

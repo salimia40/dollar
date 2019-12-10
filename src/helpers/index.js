@@ -25,7 +25,11 @@ const {
   maxCanSell,
   buyAvg,
   sellAvg,
-  formatNumber
+  maxCanBuyToday,
+  maxCanBuyTomorrow,
+  maxCanSellToday,
+  maxCanSellTomorrow,
+  formatNumber,getMax
 } = require('./core')
 
 function justPersian(str) {
@@ -1187,6 +1191,11 @@ module.exports = {
   reAnnounceBill,
   userToStringByUser,
   justPersian,
+  
+  maxCanBuyToday,
+  maxCanBuyTomorrow,
+  maxCanSellToday,
+  maxCanSellTomorrow,getMax,
 
   isOwner: ctx => {
     console.log(ctx.user)

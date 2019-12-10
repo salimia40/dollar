@@ -336,67 +336,39 @@ module.exports = {
     )
   },
   goldInv: async ctx => {
+    let bills = await Bill.find({
+      userId: ctx.user.userId,
+      closed: true,
+      left: {
+        $gt: 0
+      }
+    })
 
-    
-  let bills = await Bill.find({
-    userId: ctx.user.userId,
-    closed: true,
-    left: {
-      $gt: 0
+    var tot0 = 0
+    var tot1 = 0
+    while (bills.length > 0) {
+      var b = bills.pop()
+      if (b.due == 0) {
+        if (b.isSell) tot0 += b.left
+        else tot0 -= b.left
+      } else {
+        if (b.isSell) tot1 += b.left
+        else tot1 -= b.left
+      }
     }
-  })
 
-  var tot0 = 0
-  var tot1 = 0
-  while (bills.length > 0) {
-    var b = bills.pop()
-    if (b.due == 0) {
-      if (b.isSell) tot0 += b.left
-      else tot0 -= b.left
-    } else {
-      if (b.isSell) tot1 += b.left
-      else tot1 -= b.left
-    }
-  }
+    var max = await helpers.getMax(ctx)
 
-  var msg = `موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
-  موجودی ${tot1 > 0 ? 'فروش' : 'خرید'} فردایی: ${Math.abs(tot1)}
-  موجودی آزاد خرید: ${await helpers.maxCanBuy(ctx)}
-  موجودی آزاد فروش: ${await helpers.maxCanSell(ctx)}
+    var msg = `موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
+موجودی ${tot1 > 0 ? 'فروش' : 'خرید'} فردایی: ${Math.abs(tot1)}
+
+موجودی آزاد خرید امروزی: ${max.mCBT}
+موجودی آزاد فروش امروزی: ${max.mCST}
+موجودی آزاد خرید فردایی: ${max.mCBM}
+موجودی آزاد فروش فردایی: ${max.mCSM}
+
+کل موجودی آزاد : ${max.mx}
   `
-
-  
-    // for (var i = 0; i < bills.length; i++) {
-    //   count += bills[i].left
-    // }
-
-    // if (count == 0) {
-    //   bills = await Bill.find({
-    //     userId: ctx.message.from.id,
-    //     isSell: true,
-    //     closed: true,
-    //     left: {
-    //       $gt: 0
-    //     }
-    //   })
-
-    //   await helpers.asyncForEach(bills, bill => {
-    //     count += bill.left
-    //   })
-    //   count = 0 - count
-    // }
-    // var msg
-    // if (count < 0) {
-    //   msg = `${Math.abs(count)}  واحد فروش`
-    // } else if (count == 0) {
-    //   msg = `صفر واحد`
-    // } else msg = `${Math.abs(count)}  واحد خرید`
-
-    // var es =
-    //   count < 0 ? await helpers.maxCanSell(ctx) : await helpers.maxCanBuy(ctx)
-
-    // // var mcb = Math.floor(ctx.user.charge / ctx.setting.getBaseCharge())
-    // msg += `\n موجودی آزاد ${es} واحد`
 
     ctx.reply(msg)
   },
@@ -609,10 +581,24 @@ module.exports = {
     } else return next()
   },
   validateOffer: async (ctx, next) => {
-    var { amount, isSell, price, type } = ctx.lafz
+    var { amount, isSell, price, due, type } = ctx.lafz
 
-    let mx = await helpers.maxCanSell(ctx, false)
-    let mcb = await helpers.maxCanBuy(ctx, false)
+    // maxCanBuyToday,
+    // maxCanBuyTomorrow,
+    // maxCanSellToday,
+    // maxCanSellTomorrow,
+
+    var max = await helpers.getMax(ctx,false)
+
+    let mx =
+      due == 0
+        ? max.mCST
+        : max.mCSM
+    
+    let mcb =
+      due == 0
+        ? max.mCBT
+        : max.mCBM
 
     let mt = helpers.matchTolerance(price, 0)
     console.log(mt)
@@ -718,7 +704,7 @@ module.exports = {
       left: amount,
       price: price,
       isSell: isSell,
-      type,
+      // type,
       due
     })
     bill = await bill.save()
@@ -741,18 +727,26 @@ module.exports = {
         if (bill.sellAsWhole && bill.amount != amount) return
         if (!bill.sellAsWhole && bill.amount < amount) return
 
-        let mx = await helpers.maxCanSell(ctx)
-        let mcb = await helpers.maxCanBuy(ctx)
-        // let bc = await ctx.setting.getBaseCharge()
+        var due = bill.due
+
+        var max = await helpers.getMax(ctx,false)
+
+        let mx =
+          due == 0
+            ? max.mCST
+            : max.mCSM
+        
+        let mcb =
+          due == 0
+            ? max.mCBT
+            : max.mCBM
+
         let bc =
           ctx.user.config.baseCharge == -1
             ? ctx.setting.getBaseCharge()
             : ctx.user.config.baseCharge
 
         let isSell = !bill.isSell
-        // if (ctx.user.role == config.role_owner) {
-        //     ctx.deleteMessage()
-        // }
 
         if (ctx.user.charge < bc) {
           return ctx.telegram.sendMessage(
@@ -781,7 +775,7 @@ module.exports = {
 
         let price = bill.price
         // let type = bill.type
-        let due = bill.due
+        // let due = bill.due
         let sellerId, buyerId
         if (isSell) {
           sellerId = ctx.user.userId

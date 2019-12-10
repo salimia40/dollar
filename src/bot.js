@@ -831,8 +831,8 @@ module.exports = async () => {
     ctx.setting.deActivate()
     var bills = await Bill.find({
       expired: false,
+      closed: true,
       settled: false,
-      due: { $gt: 0 },
       left: { $gt: 0 }
     })
     await ctx.reply(
@@ -844,12 +844,16 @@ module.exports = async () => {
       bill.due = 0
       await bill.save()
     }
+
     var users = await User.find()
 
     await ctx.reply('در حال محاسبه مجدد فاکتور حراج')
     while (users.length > 0) {
       var user = users.pop()
-      var res = await helpers.countAwkwardness(null, null, user)
+      if (user == undefined) continue
+      if(user.role == config.role_bot ) continue 
+      if(user.role == config.role_bot_assistant ) continue 
+      await helpers.countAwkwardness(ctx, null, user)
       // todo snd a message to user
     }
     await ctx.reply('تبدیل فردایی به امروزی به اتمام رسید')
