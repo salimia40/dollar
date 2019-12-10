@@ -29,7 +29,8 @@ const {
   maxCanBuyTomorrow,
   maxCanSellToday,
   maxCanSellTomorrow,
-  formatNumber,getMax
+  formatNumber,
+  getMax
 } = require('./core')
 
 function justPersian(str) {
@@ -618,10 +619,9 @@ const reAnnounceBill = async (ctx, bill, text) => {
     ' </b> ' +
     due
 
-  if (!bill.expired) msg += '( مانده ' + bill.amount + ')'
-  else {
-    msg += '(منقضی شد)'
-  }
+  if (text) msg += `(${text})`
+  else if (!bill.expired) msg += '( مانده ' + bill.amount + ')'
+  else msg += '(منقضی شد)'
 
   if (bill.condition != 'عادی') {
     msg = '(آگهی خودکار) \n' + msg
@@ -1090,9 +1090,11 @@ const checkAwkWithDue = async (ctx, user, due) => {
         amount: amount,
         condition: 'حراج',
         left: amount,
+        am: amount,
         due,
         price
       })
+
       abill = await abill.save()
       announceBill(ctx, abill, false)
     }
@@ -1191,11 +1193,12 @@ module.exports = {
   reAnnounceBill,
   userToStringByUser,
   justPersian,
-  
+
   maxCanBuyToday,
   maxCanBuyTomorrow,
   maxCanSellToday,
-  maxCanSellTomorrow,getMax,
+  maxCanSellTomorrow,
+  getMax,
 
   isOwner: ctx => {
     console.log(ctx.user)

@@ -721,6 +721,7 @@ module.exports = {
         })
         if (bill == undefined || bill.closed || bill.expired) {
           // faker.forceDeal(ctx.message.reply_to_message.message_id)
+          if(bill.expired) helpers.reAnnounceBill(ctx,bill,'منقضی شد')
           return
         }
         let amount = +ctx.match[0]

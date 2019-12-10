@@ -827,37 +827,37 @@ module.exports = async () => {
     })
   })
 
-  bot.hears(akeys.decdue, privateMiddleWare, ownerMiddleWare, async ctx => {
-    ctx.setting.deActivate()
-    var bills = await Bill.find({
-      expired: false,
-      closed: true,
-      settled: false,
-      left: { $gt: 0 }
-    })
-    await ctx.reply(
-      ' در حال تبدیل فردایی به امروزی. تا اتمام عملیات از باز کردن گروه خودداری کنید.'
-    )
-    while (bills.length > 0) {
-      var bill = bills.pop()
-      if (bill == undefined) continue
-      bill.due = 0
-      await bill.save()
-    }
+  // bot.hears(akeys.decdue, privateMiddleWare, ownerMiddleWare, async ctx => {
+  //   ctx.setting.deActivate()
+  //   var bills = await Bill.find({
+  //     expired: false,
+  //     closed: true,
+  //     settled: false,
+  //     left: { $gt: 0 }
+  //   })
+  //   await ctx.reply(
+  //     ' در حال تبدیل فردایی به امروزی. تا اتمام عملیات از باز کردن گروه خودداری کنید.'
+  //   )
+  //   while (bills.length > 0) {
+  //     var bill = bills.pop()
+  //     if (bill == undefined) continue
+  //     bill.due = 0
+  //     await bill.save()
+  //   }
 
-    var users = await User.find()
+  //   var users = await User.find()
 
-    await ctx.reply('در حال محاسبه مجدد فاکتور حراج')
-    while (users.length > 0) {
-      var user = users.pop()
-      if (user == undefined) continue
-      if(user.role == config.role_bot ) continue 
-      if(user.role == config.role_bot_assistant ) continue 
-      await helpers.countAwkwardness(ctx, null, user)
-      // todo snd a message to user
-    }
-    await ctx.reply('تبدیل فردایی به امروزی به اتمام رسید')
-  })
+  //   await ctx.reply('در حال محاسبه مجدد فاکتور حراج')
+  //   while (users.length > 0) {
+  //     var user = users.pop()
+  //     if (user == undefined) continue
+  //     if(user.role == config.role_bot ) continue 
+  //     if(user.role == config.role_bot_assistant ) continue 
+  //     await helpers.countAwkwardness(ctx, null, user)
+  //     // todo snd a message to user
+  //   }
+  //   await ctx.reply('تبدیل فردایی به امروزی به اتمام رسید')
+  // })
 
   // bot.hears(akeys.dobock, hears.doBlock)
   bot.hears(akeys.dobock, privateMiddleWare, ownerMiddleWare, hears.doBlock)
