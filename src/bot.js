@@ -248,68 +248,76 @@ module.exports = async () => {
   bot.action('noreverse', ownerMiddleWare, privateMiddleWare, ctx => {
     ctx.deleteMessage()
   })
-  bot.action(/yupreverse:\d+/, ownerMiddleWare, privateMiddleWare, async ctx => {
-    ctx.deleteMessage()
-    
-    var [_, code] = ctx.match[0].split(':')
-    code = +code
+  bot.action(
+    /yupreverse:\d+/,
+    ownerMiddleWare,
+    privateMiddleWare,
+    async ctx => {
+      ctx.deleteMessage()
 
-    var bills = await Bill.find({ code })
-    if (bills.length !== 2) {
-      // bills not found
-      ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
-    }
-    const isReversable = async bill => {
-      var usr = await User.findOne({userId: bill.userId})
-      
-      return {reversable: usr.lastBill && usr.lastBill == bill.code,
-      user: usr}
-    }
+      var [_, code] = ctx.match[0].split(':')
+      code = +code
 
-    const reverseBill = async (bill,user) => {
-      var closes = bill.closes
-      console.log(closes)
-      while (closes.length > 0) {
-        var closed = closes.pop()
-        console.log(closed)
-        if(closed == undefined) continue
-        var b = new Bill({
-          userId: user.userId,
-          price: closed.price,
-          amount: closed.amount,
-          isSell: closed.isSell,
-          code: ctx.setting.getCode(),
-          left: closed.amount,
-          closed: true,
-          due: bill.due,
-          condition: 'برگشتی'
-        })
-        await b.save()
+      var bills = await Bill.find({ code })
+      if (bills.length !== 2) {
+        // bills not found
+        ctx.answerCbQuery('فاکتور جهت لغو معامله یافت نشد')
       }
-      // user.charge += bill.commition
-      user.charge -= user.lastProfit
-      bill.left = 0
-      bill.condition = 'لغو شده'
-      // bill.profit = 0
-      // bill.commition = 0
-      user.lastBill = null
-      await bill.save()
-      user = await user.save()
-      await helpers.countAwkwardness(ctx,null,user)
-    }
+      const isReversable = async bill => {
+        var usr = await User.findOne({ userId: bill.userId })
 
-    var rev0 = await isReversable(bills[0])
-    var rev1 = await isReversable(bills[1])
-    
-    if (rev0.reversable && rev1.reversable) {
-      reverseBill(bills[0],rev0.user)
-      reverseBill(bills[1],rev1.user)
-      ctx.reply(`معامله با کد ${code} لغو شد`)
-    } else {
-      ctx.answerCbQuery('به دلیل معامله های بعدی لغو معامله امکان پذیر نیست...')
-      
+        return {
+          reversable: usr.lastBill && usr.lastBill == bill.code,
+          user: usr
+        }
+      }
+
+      const reverseBill = async (bill, user) => {
+        var closes = bill.closes
+        console.log(closes)
+        while (closes.length > 0) {
+          var closed = closes.pop()
+          console.log(closed)
+          if (closed == undefined) continue
+          var b = new Bill({
+            userId: user.userId,
+            price: closed.price,
+            amount: closed.amount,
+            isSell: closed.isSell,
+            code: ctx.setting.getCode(),
+            left: closed.amount,
+            closed: true,
+            due: bill.due,
+            condition: 'برگشتی'
+          })
+          await b.save()
+        }
+        // user.charge += bill.commition
+        user.charge -= user.lastProfit
+        bill.left = 0
+        bill.condition = 'لغو شده'
+        // bill.profit = 0
+        // bill.commition = 0
+        user.lastBill = null
+        await bill.save()
+        user = await user.save()
+        await helpers.countAwkwardness(ctx, null, user)
+      }
+
+      var rev0 = await isReversable(bills[0])
+      var rev1 = await isReversable(bills[1])
+
+      if (rev0.reversable && rev1.reversable) {
+        reverseBill(bills[0], rev0.user)
+        reverseBill(bills[1], rev1.user)
+        ctx.reply(`معامله با کد ${code} لغو شد`)
+      } else {
+        ctx.answerCbQuery(
+          'به دلیل معامله های بعدی لغو معامله امکان پذیر نیست...'
+        )
+      }
     }
-  })
+  )
   bot.action('cancel', privateMiddleWare, actions.cancel)
   bot.action(
     /confirmtransaction:\d+/,
@@ -397,8 +405,6 @@ module.exports = async () => {
     helpers.setQuotation(ctx, c)
     ctx.deleteMessage()
   })
-
-  
 
   bot.command('manage_keys', ownerMiddleWare, ctx => {
     ctx.reply(
@@ -749,6 +755,67 @@ module.exports = async () => {
     ownerMiddleWare,
     enter('commitionScene')
   )
+
+  bot.hears(
+    akeys.enableChat,
+    privateMiddleWare,
+    ownerMiddleWare,
+    (ctx, next) => {
+      ctx.setting.enableChat()
+      ctx.reply(
+        'چت در گروه فعال شد',
+        Markup.keyboard([
+          [akeys.commition, akeys.tolerence, akeys.basecharge],
+          [akeys.quotation, akeys.incQuotation, akeys.decQuotation],
+          [akeys.nextSettle, akeys.delay, akeys.increase],
+          [akeys.charge, akeys.doSettle, akeys.decrease],
+          [akeys.sendToGroup, akeys.sendToUsers, akeys.manageUsers],
+          [akeys.showFac, akeys.activate, akeys.activateCashRec],
+          [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
+          [ctx.setting.chatEnabled() ? akeys.disableChat : akeys.enableChat],
+          [akeys.activateAuto, akeys.deactivateAuto],
+          [akeys.setBotCard, akeys.getSettings],
+          // [akeys.decdue],
+          [keys.back]
+        ])
+          .resize()
+          .extra()
+      )
+      // next()
+    }
+    // hears.manage
+  )
+
+  bot.hears(
+    akeys.disableChat,
+    privateMiddleWare,
+    ownerMiddleWare,
+    (ctx, next) => {
+      ctx.setting.disableChat()
+      ctx.reply(
+        'چت در گروه غیر فعال شد',
+        Markup.keyboard([
+          [akeys.commition, akeys.tolerence, akeys.basecharge],
+          [akeys.quotation, akeys.incQuotation, akeys.decQuotation],
+          [akeys.nextSettle, akeys.delay, akeys.increase],
+          [akeys.charge, akeys.doSettle, akeys.decrease],
+          [akeys.sendToGroup, akeys.sendToUsers, akeys.manageUsers],
+          [akeys.showFac, akeys.activate, akeys.activateCashRec],
+          [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
+          [ctx.setting.chatEnabled() ? akeys.disableChat : akeys.enableChat],
+          [akeys.activateAuto, akeys.deactivateAuto],
+          [akeys.setBotCard, akeys.getSettings],
+          // [akeys.decdue],
+          [keys.back]
+        ])
+          .resize()
+          .extra()
+      )
+      // next()
+    }
+    // hears.manage
+  )
+
   bot.hears(
     akeys.quotation,
     privateMiddleWare,
@@ -851,8 +918,8 @@ module.exports = async () => {
   //   while (users.length > 0) {
   //     var user = users.pop()
   //     if (user == undefined) continue
-  //     if(user.role == config.role_bot ) continue 
-  //     if(user.role == config.role_bot_assistant ) continue 
+  //     if(user.role == config.role_bot ) continue
+  //     if(user.role == config.role_bot_assistant ) continue
   //     await helpers.countAwkwardness(ctx, null, user)
   //     // todo snd a message to user
   //   }

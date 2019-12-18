@@ -49,7 +49,7 @@ scene.hears(
 
       var tot0 = 0
       var tot1 = 0
-      
+
       while (bills.length > 0) {
         var b = bills.pop()
         if (b.due == 0) {
@@ -63,7 +63,7 @@ scene.hears(
 
       var max = await helpers.getMax({ user }, false)
 
-      var msg = `موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
+      msg += `موجودی ${tot0 > 0 ? 'فروش' : 'خرید'} امروزی: ${Math.abs(tot0)}
 موجودی ${tot1 > 0 ? 'فروش' : 'خرید'} فردایی: ${Math.abs(tot1)}
       
 موجودی آزاد خرید امروزی: ${max.mCBT}

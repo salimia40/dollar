@@ -2,89 +2,90 @@ const templates = require('./templates')
 const samples = require('./samples')
 console.log(process.env.TOKEN)
 module.exports = {
-    templates,samples,
-    token: process.env.TOKEN,
-    g_token: process.env.G_TOKEN,
-    db_url: process.env.MONGO_URI,
-    btns: {
-        confirm: '✅ تایید',
-        cancel: '❌ انصراف'
-    },
-    keys: {
-        openfacts: '📜 فاکتور های باز',
-        myReferLink: 'لینک دعوت من',
-        monthlyReport: '📔 گزارش ماهانه',
-        postSettleReport: 'گزارش معاملات پس از تسویه',
-        semiSettle: 'تسویه موقت',
-        packInv: '💲موجودی دلار',
-        changeInv: '💶 موجودی مالی',
-        userInfo: '👤 اطلاعات فردی',
-        contact: '👨🏻‍💼ارتباط با ما',
-        eccountant: 'حسابداری',
-        support: 'پشتیبانی',
-        summitResipt: '🏦 ثبت فیش واریزی',
-        reqCash: '💶 درخواست وجه',
-        reqRESIVEGOLG: 'درخواست تحویل فیزیکی',
-        reqCard: '💳 شماره کارت واریز',
-        sendDocs: 'ارسال مدارک',
-        cardInfo: '💳 شماره کارت شما',
-        transactions: '🧮 تراکنش ها',
-        help: '📌 راهنما',
-        contactManager: '👨🏻‍💼ارتباط با مدیر',
-        back: '🔙 بازگشت',
-        manage: 'مدیریت ربات',
-    },
-    adminKeys: {
-        commition: '💲 میزان کمیسیون',
-        tolerence: '📈 میزان تلورانس',
-        quotation: '💷 نرخ مظنه',
-        decdue: 'تبدیل فردایی به امروزی',
-        incQuotation: '🔼 مظنه',
-        decQuotation: '🔽 مظنه',
-        delay: '⌛ اعتبار لفظ',
-        basecharge: '💰وجه تضمین',
-        settleQuotation: '💸نرخ تسویه',
-        nextSettle: '⏰زمان تسویه بعدی',
-        activateCashRec: '🔓 بازکردن درخواست وجه',
-        deactivateCashRec: '🔐 بستن درخواست وجه',
-        increase: '⬆️افزایش',
-        decrease: '⬇️ کاهش',
-        increaseBotCharge: '💰افزایش موجودی ربات',
-        addMember: '👤ثبت عضو جدید',
-        setBotCard: 'ثبت کارت واریز 💳',
-        charge: '💳موجودی حساب',
-        doSettle: '💎اعمال تسویه حساب',
-        sendToGroup: '📢ارسال مطلب به گروه',
-        sendToUsers: '💬ارسال مطلب به کاربران',
-        changeRole: '⭐️تغییر نقش کاربران',
-        manageUsers: '👨‍🔧مدیریت کاربران',
-        getSettings: '⚙️مشاهده تنظیمات',
-        showVips: 'مشاهده کاربران vip',
-        showAdmins: 'مشاهده مدیر',
-        showEccountant: '⚙️مشاهده حسابدار',
-        inviters: '⚙️مشاهده معرف ها',
-        setVipOff: 'تنظیم درصد کمیسیون vip',
-        activate: '🔓 بازکردن گروه',
-        deactivate: '🔐 بستن گروه',
-        activateFaker: '🔓 معاملات صوری',
-        deactivateFaker: '🔐 معاملات صوری',
-        showFac: '👌 نمایش فاکتور در گروه',
-        dShowFac: '💣 عدم نمایش فاکتور در گروه',
-        dobock: 'اعمال بلوکه',
-        giftUser: 'تخصیص اعتبار هدیه 🎁',
-        allUsers: '↙️ لیست کاربران',
-        activateAuto: '✅ مظنه خودکار',
-        deactivateAuto: '🚫 مظنه خودکار',
-        viewUser: '👤 برسی حساب کاربر',
-        editUser: '👤 ویرایش حساب کاربر',
-        sentToUser: '🔁 پیام به کاربر'
-
-
-    },
-    welcomeMessage: `با سلام
+  templates,
+  samples,
+  token: process.env.TOKEN,
+  g_token: process.env.G_TOKEN,
+  db_url: process.env.MONGO_URI,
+  btns: {
+    confirm: '✅ تایید',
+    cancel: '❌ انصراف'
+  },
+  keys: {
+    openfacts: '📜 فاکتور های باز',
+    myReferLink: 'لینک دعوت من',
+    monthlyReport: '📔 گزارش ماهانه',
+    postSettleReport: 'گزارش معاملات پس از تسویه',
+    semiSettle: 'تسویه موقت',
+    packInv: '💲موجودی دلار',
+    changeInv: '💶 موجودی مالی',
+    userInfo: '👤 اطلاعات فردی',
+    contact: '👨🏻‍💼ارتباط با ما',
+    eccountant: 'حسابداری',
+    support: 'پشتیبانی',
+    summitResipt: '🏦 ثبت فیش واریزی',
+    reqCash: '💶 درخواست وجه',
+    reqRESIVEGOLG: 'درخواست تحویل فیزیکی',
+    reqCard: '💳 شماره کارت واریز',
+    sendDocs: 'ارسال مدارک',
+    cardInfo: '💳 شماره کارت شما',
+    transactions: '🧮 تراکنش ها',
+    help: '📌 راهنما',
+    contactManager: '👨🏻‍💼ارتباط با مدیر',
+    back: '🔙 بازگشت',
+    manage: 'مدیریت ربات'
+  },
+  adminKeys: {
+    commition: '💲 میزان کمیسیون',
+    tolerence: '📈 میزان تلورانس',
+    quotation: '💷 نرخ مظنه',
+    decdue: 'تبدیل فردایی به امروزی',
+    incQuotation: '🔼 مظنه',
+    decQuotation: '🔽 مظنه',
+    enableChat: 'فعال سازی چت 💬',
+    disableChat: 'غیر فعال سازی چت 😐',
+    delay: '⌛ اعتبار لفظ',
+    basecharge: '💰وجه تضمین',
+    settleQuotation: '💸نرخ تسویه',
+    nextSettle: '⏰زمان تسویه بعدی',
+    activateCashRec: '🔓 بازکردن درخواست وجه',
+    deactivateCashRec: '🔐 بستن درخواست وجه',
+    increase: '⬆️افزایش',
+    decrease: '⬇️ کاهش',
+    increaseBotCharge: '💰افزایش موجودی ربات',
+    addMember: '👤ثبت عضو جدید',
+    setBotCard: 'ثبت کارت واریز 💳',
+    charge: '💳موجودی حساب',
+    doSettle: '💎اعمال تسویه حساب',
+    sendToGroup: '📢ارسال مطلب به گروه',
+    sendToUsers: '💬ارسال مطلب به کاربران',
+    changeRole: '⭐️تغییر نقش کاربران',
+    manageUsers: '👨‍🔧مدیریت کاربران',
+    getSettings: '⚙️مشاهده تنظیمات',
+    showVips: 'مشاهده کاربران vip',
+    showAdmins: 'مشاهده مدیر',
+    showEccountant: '⚙️مشاهده حسابدار',
+    inviters: '⚙️مشاهده معرف ها',
+    setVipOff: 'تنظیم درصد کمیسیون vip',
+    activate: '🔓 بازکردن گروه',
+    deactivate: '🔐 بستن گروه',
+    activateFaker: '🔓 معاملات صوری',
+    deactivateFaker: '🔐 معاملات صوری',
+    showFac: '👌 نمایش فاکتور در گروه',
+    dShowFac: '💣 عدم نمایش فاکتور در گروه',
+    dobock: 'اعمال بلوکه',
+    giftUser: 'تخصیص اعتبار هدیه 🎁',
+    allUsers: '↙️ لیست کاربران',
+    activateAuto: '✅ مظنه خودکار',
+    deactivateAuto: '🚫 مظنه خودکار',
+    viewUser: '👤 برسی حساب کاربر',
+    editUser: '👤 ویرایش حساب کاربر',
+    sentToUser: '🔁 پیام به کاربر'
+  },
+  welcomeMessage: `با سلام
  به اتاق معاملاتی ارز آنلاین خوش آمدید`,
-    contract: [
-        `....... 🙏 بنام خالق یکتا 🙏 .......
+  contract: [
+    `....... 🙏 بنام خالق یکتا 🙏 .......
 
         💫 قوانین گروه معاملاتی ارز آنلاین 💫
         
@@ -116,13 +117,13 @@ module.exports = {
         سود و ضرر معاملات به صورت روزانه پرداخت و دریافت می‌شود.
         
          موفق و پرسود باشید 🌹`.trim()
-    ],
-    role_admin: 'bot-admin',
-    role_owner: 'bot-owner',
-    role_shared_owner: 'bot-shared-owner',
-    role_bot: 'bot-bot',
-    role_bot_assistant: 'bot-assist',
-    role_member: 'bot-member',
-    role_vip: 'bot-vip',
-    role_eccountant: 'bot-eccountant',
+  ],
+  role_admin: 'bot-admin',
+  role_owner: 'bot-owner',
+  role_shared_owner: 'bot-shared-owner',
+  role_bot: 'bot-bot',
+  role_bot_assistant: 'bot-assist',
+  role_member: 'bot-member',
+  role_vip: 'bot-vip',
+  role_eccountant: 'bot-eccountant'
 }

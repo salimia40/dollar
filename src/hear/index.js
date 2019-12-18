@@ -408,6 +408,7 @@ module.exports = {
             [akeys.sendToGroup, akeys.sendToUsers, akeys.manageUsers],
             [akeys.showFac, akeys.activate, akeys.activateCashRec],
             [akeys.dShowFac, akeys.deactivate, akeys.deactivateCashRec],
+            [ctx.setting.chatEnabled() ? akeys.disableChat : akeys.enableChat],
             [akeys.activateAuto, akeys.deactivateAuto],
             [akeys.setBotCard, akeys.getSettings],
             // [akeys.decdue],
@@ -588,17 +589,11 @@ module.exports = {
     // maxCanSellToday,
     // maxCanSellTomorrow,
 
-    var max = await helpers.getMax(ctx,false)
+    var max = await helpers.getMax(ctx, false)
 
-    let mx =
-      due == 0
-        ? max.mCST
-        : max.mCSM
-    
-    let mcb =
-      due == 0
-        ? max.mCBT
-        : max.mCBM
+    let mx = due == 0 ? max.mCST : max.mCSM
+
+    let mcb = due == 0 ? max.mCBT : max.mCBM
 
     let mt = helpers.matchTolerance(price, 0)
     console.log(mt)
@@ -721,7 +716,7 @@ module.exports = {
         })
         if (bill == undefined || bill.closed || bill.expired) {
           // faker.forceDeal(ctx.message.reply_to_message.message_id)
-          if(bill.expired) helpers.reAnnounceBill(ctx,bill,'منقضی شد')
+          if (bill.expired) helpers.reAnnounceBill(ctx, bill, 'منقضی شد')
           return
         }
         let amount = +ctx.match[0]
@@ -730,17 +725,11 @@ module.exports = {
 
         var due = bill.due
 
-        var max = await helpers.getMax(ctx,false)
+        var max = await helpers.getMax(ctx, false)
 
-        let mx =
-          due == 0
-            ? max.mCST
-            : max.mCSM
-        
-        let mcb =
-          due == 0
-            ? max.mCBT
-            : max.mCBM
+        let mx = due == 0 ? max.mCST : max.mCSM
+
+        let mcb = due == 0 ? max.mCBT : max.mCBM
 
         let bc =
           ctx.user.config.baseCharge == -1
