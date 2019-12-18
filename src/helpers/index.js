@@ -298,7 +298,7 @@ const countAwkwardness = async (ctx, bill, user) => {
 
   // margin
   var t = 15
-  var axl = Math.floor((user.charge * 0.9) / totalOPF / 1000)
+  var axl = Math.floor((user.charge * 0.8) / totalOPF / 1000)
   var awk, sellprice
 
   console.log('__________________________________________________________')
@@ -975,7 +975,7 @@ const onCharge = async userId => {
 
   var t = 15
 
-  var axl = Math.floor((user.charge * 0.9) / totalOPF / 1000)
+  var axl = Math.floor((user.charge * 0.8) / totalOPF / 1000)
 
   var awk, sellprice
 
