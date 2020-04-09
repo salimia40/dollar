@@ -409,12 +409,12 @@ ${
 }
 
 const closeDeals = async (ctx, b, price) => {
-  let totalProfit = 0
-  let factorsClosed = 0
-  let totalCommition = 0
-  let billsRemained = 0
+  var totalProfit = 0
+  var factorsClosed = 0
+  var totalCommition = 0
+  var billsRemained = 0
 
-  let bills = await Bill.find({
+  var bills = await Bill.find({
     userId: b.userId,
     closed: true,
     expired: false,
@@ -425,8 +425,8 @@ const closeDeals = async (ctx, b, price) => {
       $gt: 0
     }
   })
-  let am = b.amount
-  let commition = ctx.setting.getCommition()
+  var am = b.amount
+  var commition = ctx.setting.getCommition()
   var user = await User.findOne({
     userId: b.userId
   })
@@ -479,8 +479,6 @@ const closeDeals = async (ctx, b, price) => {
 
     if (am == 0) break
   }
-
-  console.log(closes)
 
   return {
     closes,
@@ -644,7 +642,7 @@ const reAnnounceBill = async (ctx, bill, text) => {
 }
 
 const makeDeal = async ctx => {
-  let { isSell, sellerId, buyerId, amount, price, bill, type, due } = ctx.values
+  let { isSell, sellerId, buyerId, amount, price, bill, due } = ctx.values
   if (sellerId == buyerId) return
   let sellerBill, buyerBill, cb
   cb = await ctx.setting.getCode()

@@ -27,7 +27,7 @@ module.exports = async () => {
   require('./log')(bot)
 
   const botUser = await bot.telegram.getMe()
-  console.log(botUser)
+  // console.log(botUser)
   let busr = await User.findOne({
     userId: botUser.id
   })
@@ -40,7 +40,7 @@ module.exports = async () => {
     })
     await busr.save()
   }
-  console.log(busr)
+  // console.log(busr)
   // cron.setCtx(ctx)
 
   var ownerMiddleWare = (ctx, next) => {

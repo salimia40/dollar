@@ -9,7 +9,7 @@ const moment = require('moment')
 
 const handler = new Composer()
 
-isTimeBetween = function(aStartTime = '00:00', anEndTime = '12:30', aCurrTime) {
+const isTimeBetween = function(aStartTime = '00:00', anEndTime = '12:30', aCurrTime) {
   // you may pass in aCurrTime or use the *actual* current time
   var currentTime = !aCurrTime ? moment() : moment(aCurrTime, 'HH:mm a')
   var startTime = moment(aStartTime, 'HH:mm a')
@@ -198,6 +198,7 @@ handler.hears(
       sellerId = bill.userId
     }
 
+    // eslint-disable-next-line require-atomic-updates
     ctx.values = {
       isSell,
       sellerId,
@@ -215,10 +216,34 @@ handler.hears(
 
 var midlware = handler.middleware()
 
+function Q() {
+  this.waitings = [];
+  this.busy = false;
+  this.onDone = function() {
+    if (this.waitings.length > 0) return this.execute(this.waitings.shift());
+    this.busy = false;
+  };
+
+  this.do = function(cb,...args) {
+    if (this.busy) {
+      this.waitings.push({cb,args});
+    } else {
+      this.execute({cb,args});
+    }
+  };
+  this.execute = async function({cb,args}) {
+    this.busy = true;
+    await cb(...args);
+    this.onDone();
+  };
+}
+
+var q = new Q()
+
 var pushToHandler = ctx => {
-  queue.push(() => {
+  q.do((ctx) => {
     midlware(ctx)
-  })
+  },ctx)
 }
 
 module.exports = handler
