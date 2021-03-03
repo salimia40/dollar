@@ -24,7 +24,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.9.7",
     "persian-date": "^1.1.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "puppeteer": "^1.18.1",
     "redis": "^2.8.0",
     "sequential-task-queue": "^1.2.1",
